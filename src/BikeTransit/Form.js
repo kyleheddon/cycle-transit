@@ -19,7 +19,7 @@ export default ({
 	const loadingProgress = ((loadingStep + 1) / Progress.length) * 100;
 
 	return (
-		<React.Fragment>
+		<>
 			{(loading &&
 				<LinearProgress variant="determinate" value={loadingProgress} />
 			)}
@@ -63,6 +63,6 @@ export default ({
 					</div>
 				</FormGroup>
 			</form>
-		</React.Fragment>
+		</>
 	);
 }

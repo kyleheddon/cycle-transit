@@ -3,7 +3,7 @@ import React from 'react';
 import { StaticRouter } from 'react-router-dom';
 import express from 'express';
 import { renderToString } from 'react-dom/server';
-import { makeRouteV2 } from './services/route';
+import { makeRoute } from './services/route';
 import './services/websocket';
 const assets = require(process.env.RAZZLE_ASSETS_MANIFEST);
 
@@ -11,13 +11,12 @@ const server = express();
 server
   .disable('x-powered-by')
   .use(express.static(process.env.RAZZLE_PUBLIC_DIR))
-  .get('/route-v2', (req, res) => {
+  .get('/route', (req, res) => {
       const {
           origin,
           destination,
-          includeTransitMode,
       } = req.query;
-      makeRouteV2(origin, destination, { includeTransitMode: JSON.parse(includeTransitMode) }).then((result) => {
+      makeRoute(origin, destination).then((result) => {
          res.status(200).send(result); 
       })
   })

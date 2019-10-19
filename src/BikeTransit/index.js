@@ -2,7 +2,7 @@ import React, { useState, Fragment } from 'react';
 import Form from './Form';
 import Route from './Route';
 import RoutePreview from './RoutePreview';
-import { makeRouteV2 } from './api';
+import { makeRoute } from './api';
 import { Progress } from '../constants/route-progress';
 
 export default () => {
@@ -37,7 +37,7 @@ export default () => {
 						const onUpdate = ({ status }) => {
 							setLoadingStep(Progress.indexOf(status));
 						}
-						makeRouteV2(origin, destination, onUpdate).then((route) => {
+						makeRoute(origin, destination, onUpdate).then((route) => {
 							setRoute(route);
 							setLoading(false);
 						});

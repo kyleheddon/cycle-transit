@@ -12,7 +12,7 @@ import {
 	MAKE_ROUTE_COMPLETE,
 } from '../constants/websocket-messages';
 
-export function makeRouteV2(origin, destination, onUpdate) {
+export function makeRoute(origin, destination, onUpdate) {
 	return new Promise((resolve, reject) => {
 		makeRouteWebsocket(origin, destination, (message) => {
 			if (message.status === MAKE_ROUTE_COMPLETE) {
@@ -20,7 +20,7 @@ export function makeRouteV2(origin, destination, onUpdate) {
 			} else {
 				onUpdate(message);
 			}
-		}, options);
+		});
 	});
 }
 
