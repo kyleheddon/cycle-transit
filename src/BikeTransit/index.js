@@ -3,25 +3,22 @@ import Form from './Form';
 import Route from './Route';
 import RoutePreview from './RoutePreview';
 import { makeRouteV2 } from './api';
+import { Progress } from '../constants/route-progress';
 
 export default () => {
-	const [state, setState] = useState({
-		showForm: true,
-		origin: '417 Willow Decatur',
-		destination: 'Derry Ave Atlanta',
-		includeTransitMode: true,
-		loading: false,
-		route: null,
+	const [formParams, setFormParams] = useState({
+		origin: 'Willow Lane, Decatur',
+		destination: 'Ponce City Market',
 	});
-	
+	const [route, setRoute] = useState(null);
+	const [loading, setLoading] = useState(false);
+	const [loadingStep, setLoadingStep] = useState(0);
+
 	const {
-		showForm,
 		origin,
 		destination,
-		loading,
-		route,
 		includeTransitMode,
-	} = state;
+	} = formParams;
 
 	if (route === null) {
 		return (
@@ -29,24 +26,20 @@ export default () => {
 				<Form
 					origin={origin}
 					destination={destination}
-					includeTransitMode={includeTransitMode}
 					loading={loading}
-					onChange={(updates) => setState({
-						...state,
+					loadingStep={loadingStep}
+					onChange={(updates) => setFormParams({
+						...formParams,
 						...updates,
 					})}
 					onSubmit={() => {
-						setState({
-							...state,
-							loading: true,
-						});
-						
-						makeRouteV2(origin, destination, { includeTransitMode }).then((route) => {
-							setState({
-								...state,
-								route,
-								loading: false,
-							});
+						setLoading(true);
+						const onUpdate = ({ status }) => {
+							setLoadingStep(Progress.indexOf(status));
+						}
+						makeRouteV2(origin, destination, onUpdate).then((route) => {
+							setRoute(route);
+							setLoading(false);
 						});
 					}}
 				/>

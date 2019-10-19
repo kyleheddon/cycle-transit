@@ -5,6 +5,8 @@ import Input from '@material-ui/core/Input';
 import TextField from '@material-ui/core/TextField';
 import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
+import LinearProgress from '@material-ui/core/LinearProgress';
+import { Progress } from '../constants/route-progress';
 
 export default ({
 	onChange,
@@ -12,70 +14,55 @@ export default ({
 	destination,
 	onSubmit,
 	loading,
-	includeTransitMode,
+	loadingStep,
 }) => {
+	const loadingProgress = ((loadingStep + 1) / Progress.length) * 100;
+
 	return (
-		<form
-			id="route_form"
-			onSubmit={(event) => {
-				event.preventDefault();
-				onSubmit();
-			}}
-		>
-			<FormGroup>
-				<div>
-					<TextField
-						type="text"
-						value={origin}
-						label="Origin"
-						disabled={loading}
-						onChange={(event) => onChange({
-							origin: event.target.value,
-						})}
-					/>
-				</div>
-				<div>
-					<TextField
-						type="text"
-						value={destination}
-						label="Destination"
-						onChange={(event) => onChange({
-							destination: event.target.value,
-						})}
-					/>
-				</div>
-				<div>
-					<FormControlLabel
-						control={
-							<Checkbox
-								color="primary"
-								onChange={(event) => {
-									onChange({
-										includeTransitMode: !includeTransitMode
-									});
-								}}
-								checked={includeTransitMode}
-							/>
-						}
-						label="Include transit mode"
-					/>
-				</div>
-				<div style={{ marginTop: '1rem' }}>
-					<Button
-						form="route_form"
-						type="submit"
-						variant="contained"
-					>
-						Route
-					</Button>
-					{loading && (
-						<div>
-							loading...
-						</div>
-					)}
-					
-				</div>
-			</FormGroup>
-		</form>
+		<React.Fragment>
+			{(loading &&
+				<LinearProgress variant="determinate" value={loadingProgress} />
+			)}
+			<form
+				id="route_form"
+				onSubmit={(event) => {
+					event.preventDefault();
+					onSubmit();
+				}}
+			>
+				<FormGroup>
+					<div>
+						<TextField
+							type="text"
+							value={origin}
+							label="Origin"
+							disabled={loading}
+							onChange={(event) => onChange({
+								origin: event.target.value,
+							})}
+						/>
+					</div>
+					<div>
+						<TextField
+							type="text"
+							value={destination}
+							label="Destination"
+							onChange={(event) => onChange({
+								destination: event.target.value,
+							})}
+						/>
+					</div>
+					<div style={{ marginTop: '1rem' }}>
+						<Button
+							form="route_form"
+							type="submit"
+							variant="contained"
+						>
+							Route
+						</Button>
+					</div>
+				</FormGroup>
+			</form>
+		</React.Fragment>
 	);
 }

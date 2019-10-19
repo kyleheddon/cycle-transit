@@ -1,9 +1,9 @@
 import * as https from 'https';
-import { GOOGLE_MAP_API_DEV_KEY } from '../../keys';
 export const MODE_TRANSIT = 'transit';
 export const MODE_BICYCLING = 'bicycling';
 export const TRANSIT_MODE_RAIL = 'rail';
 const API_URL = 'https://maps.googleapis.com/maps/api/directions/json';
+const { GOOGLE_MAP_API_DEV_KEY } = process.env;
 
 export function queryMapsApi(origin, destination, mode, optionalParams = {}) {
 	const options = { ...optionalParams };

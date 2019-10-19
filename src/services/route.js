@@ -5,7 +5,6 @@ import {
 	queryMapsApi,
 } from './google-maps';
 import moment from 'moment';
-const { GOOGLE_MAP_API_DEV_KEY } = process.env;
 
 import {
 	INITIAL_ROUTE_COMPLETE,
@@ -16,17 +15,7 @@ import {
 const Cache = {}
 const useCache = false;
 
-export async function makeRouteV2(origin, destination, options = {}, updateProgress = () => {}) {
-	console.log('make route v2')
-	if (!options.includeTransitMode) {
-		const bikeRoute = await queryMapsApi(origin, destination, MODE_BICYCLING);
-		return {
-			bikeRoute,
-			arrivalTime: bikeRoute.routes[0].legs[0].duration.value,
-			duration: bikeRoute.routes[0].legs[0].duration.text,
-		}
-	}
-
+export async function makeRoute(origin, destination, updateProgress = () => {}) {
 	if (useCache && Cache[cacheKey(origin, destination)]) {
 		return Promise.resolve(Cache[cacheKey(origin, destination)]);
 	}
