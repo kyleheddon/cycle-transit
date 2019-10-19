@@ -6,7 +6,7 @@ export default () => {
 		WebSocket,
 		location,
 	} = window;
-	const port = process.env.WEBSOCKET_PORT || '3000'; // TODO fix this
+	const port = '8080'; // TODO fix this
 	const protocol = location.protocol.replace(/^http/, 'ws');
 	const hostname = location.host.split(':')[0];
 	const socket = new WebSocket(`${protocol}://${hostname}:${port}`);
