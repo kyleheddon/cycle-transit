@@ -1,4 +1,3 @@
-import { GOOGLE_MAP_API_DEV_KEY } from '../../keys';
 import {
 	MODE_TRANSIT,
 	MODE_BICYCLING,
@@ -6,6 +5,7 @@ import {
 	queryMapsApi,
 } from './google-maps';
 import moment from 'moment';
+const { GOOGLE_MAP_API_DEV_KEY } = process.env;
 
 import {
 	INITIAL_ROUTE_COMPLETE,
