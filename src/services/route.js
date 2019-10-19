@@ -1,11 +1,12 @@
-import { GOOGLE_MAP_API_DEV_KEY } from '../../keys';
+import * as http from 'http';
+import * as https from 'https';
+import moment from 'moment';
+
 const MODE_TRANSIT = 'transit';
 const MODE_BICYCLING = 'bicycling';
 const TRANSIT_MODE_RAIL = 'rail';
 const API_URL = 'https://maps.googleapis.com/maps/api/directions/json';
-import * as http from 'http';
-import * as https from 'https';
-import moment from 'moment';
+const { GOOGLE_MAP_API_DEV_KEY } = process.env;
 
 const Cache = {}
 const useCache = false;
