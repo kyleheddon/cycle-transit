@@ -9,7 +9,7 @@ export default () => {
 	const port = '8080'; // TODO fix this
 	const protocol = location.protocol.replace(/^http/, 'ws');
 	const hostname = location.host.split(':')[0];
-	const socket = new WebSocket(`${protocol}://${hostname}:${port}`);
+	const socket = new WebSocket(`${protocol}//${hostname}:${port}`);
 
 	return {
 		send: (endpoint, payload) => {
