@@ -3,22 +3,14 @@ import React from 'react';
 import { StaticRouter } from 'react-router-dom';
 import express from 'express';
 import { renderToString } from 'react-dom/server';
-import { makeRoute, makeRouteV2 } from './services/route';
+import { makeRouteV2 } from './services/route';
+import './services/websocket';
 const assets = require(process.env.RAZZLE_ASSETS_MANIFEST);
 
 const server = express();
 server
   .disable('x-powered-by')
   .use(express.static(process.env.RAZZLE_PUBLIC_DIR))
-  .get('/route', (req, res) => {
-      const {
-          origin,
-          destination,
-      } = req.query;
-      makeRoute(origin, destination).then((route) => {
-         res.status(200).send(route); 
-      })
-  })
   .get('/route-v2', (req, res) => {
       const {
           origin,

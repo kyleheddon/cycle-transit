@@ -2,7 +2,7 @@ import React, { useState, Fragment } from 'react';
 import Form from './Form';
 import Route from './Route';
 import RoutePreview from './RoutePreview';
-import { makeRoute, makeRouteV2 } from './api';
+import { makeRouteV2 } from './api';
 
 export default () => {
 	const [state, setState] = useState({
