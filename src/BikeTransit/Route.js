@@ -1,6 +1,20 @@
 import React from 'react';
+import { makeStyles } from '@material-ui/core/styles';
+import Paper from '@material-ui/core/Paper';
+import Typography from '@material-ui/core/Typography';
+import Stepper from '@material-ui/core/Stepper';
+import Step from '@material-ui/core/Step';
+import StepLabel from '@material-ui/core/StepLabel';
 const MODE_TRANSIT = 'transit';
 const MODE_BICYCLING = 'bicycling';
+
+const useStyles = makeStyles(theme => ({
+	root: {
+		padding: theme.spacing(3, 2),
+		marginTop: theme.spacing(1),
+		marginBottom: theme.spacing(1),
+	},
+}));
 
 export default ({
 	route,
@@ -10,18 +24,27 @@ export default ({
 	lastRoute,
 	destination,
 }) => {
+	const classes = useStyles();
+
+	const summary = getSummary(route.routes[0], nextRoute, lastRoute, destination, isTransit);
+	const distance = route.routes[0].legs[0].distance.text;
+
 	return (
-		<div>
-			<h3><span style={{ fontSize: '2rem' }}>{icon}</span> {getSummary(route.routes[0], nextRoute, lastRoute, destination, isTransit)} ({route.routes[0].legs[0].distance.text})</h3>
-			<ol>
+		<Paper className={classes.root}>
+			<Typography variant="h5" component="h3">
+				{icon} {summary} ({distance})
+			</Typography>
+			<Stepper activeStep={-1} orientation="vertical">
 				{route.routes[0].legs[0].steps.map((step, i) =>
-					<li key={i}>
-						<span dangerouslySetInnerHTML={{ __html: step.html_instructions }} />
-						<span> ({step.distance.text})</span>
-					</li>
+					<Step key={i}>
+						<StepLabel>
+							<span dangerouslySetInnerHTML={{ __html: step.html_instructions }} />
+							<span> ({step.distance.text})</span>
+						</StepLabel>
+					</Step>
 				)}
-			</ol>
-		</div>
+			</Stepper>
+		</Paper>
 	);
 }
 
