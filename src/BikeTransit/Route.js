@@ -5,6 +5,11 @@ import Typography from '@material-ui/core/Typography';
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
+import ExpansionPanel from '@material-ui/core/ExpansionPanel';
+import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+
 const MODE_TRANSIT = 'transit';
 const MODE_BICYCLING = 'bicycling';
 
@@ -30,21 +35,27 @@ export default ({
 	const distance = route.routes[0].legs[0].distance.text;
 
 	return (
-		<Paper className={classes.root}>
-			<Typography variant="h5" component="h3">
-				{icon} {summary} ({distance})
-			</Typography>
-			<Stepper activeStep={-1} orientation="vertical">
-				{route.routes[0].legs[0].steps.map((step, i) =>
-					<Step key={i}>
-						<StepLabel>
-							<span dangerouslySetInnerHTML={{ __html: step.html_instructions }} />
-							<span> ({step.distance.text})</span>
-						</StepLabel>
-					</Step>
-				)}
-			</Stepper>
-		</Paper>
+		<ExpansionPanel>
+			<ExpansionPanelSummary
+				expandIcon={<ExpandMoreIcon />}
+			>
+				<Typography variant="h5" component="h3">
+					{icon} {summary} ({distance})
+				</Typography>
+			</ExpansionPanelSummary>
+			<ExpansionPanelDetails>
+				<Stepper activeStep={-1} orientation="vertical">
+					{route.routes[0].legs[0].steps.map((step, i) =>
+						<Step key={i}>
+							<StepLabel>
+								<span dangerouslySetInnerHTML={{ __html: step.html_instructions }} />
+								<span> ({step.distance.text})</span>
+							</StepLabel>
+						</Step>
+					)}
+				</Stepper>
+			</ExpansionPanelDetails>
+		</ExpansionPanel>
 	);
 }
 
