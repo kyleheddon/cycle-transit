@@ -35,7 +35,10 @@ export default () => {
 					onSubmit={() => {
 						setLoading(true);
 						const onUpdate = ({ status }) => {
-							setLoadingStep(Progress.indexOf(status));
+							const step = Progress.indexOf(status);
+							if (step > -1) {
+								setLoadingStep();
+							}
 						}
 						makeRoute(origin, destination, onUpdate).then((route) => {
 							setRoute(route);

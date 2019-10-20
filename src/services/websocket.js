@@ -49,10 +49,10 @@ function handleMakeRoute(params, ws) {
 		destination,
 	} = params;
 	
-	const updateProgress = (status) => {
+	const updateProgress = (status, route = {}) => {
 		ws.send(JSON.stringify({
-			status: MAKE_ROUTE_STATUS_UPDATE,
-			status
+			status,
+			...route
 		}));
 	}
 

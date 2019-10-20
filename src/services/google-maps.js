@@ -2,6 +2,7 @@ import * as https from 'https';
 export const MODE_TRANSIT = 'transit';
 export const MODE_BICYCLING = 'bicycling';
 export const TRANSIT_MODE_RAIL = 'rail';
+export const TRANSIT_MODE_SUBWAY = 'subway';
 const API_URL = 'https://maps.googleapis.com/maps/api/directions/json';
 const { GOOGLE_MAP_API_DEV_KEY } = process.env;
 
