@@ -16,7 +16,7 @@ export default ({
 	loading,
 	loadingStep,
 }) => {
-	const loadingProgress = ((loadingStep + 1) / Progress.length) * 100;
+	const loadingProgress = ((loadingStep) / Progress.length) * 100;
 
 	return (
 		<>
