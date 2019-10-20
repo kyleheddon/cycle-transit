@@ -3,7 +3,7 @@ import React from 'react';
 import { StaticRouter } from 'react-router-dom';
 import express from 'express';
 import { renderToString } from 'react-dom/server';
-import { makeRoute, makeRouteV2 } from './services/route';
+import { makeRoute } from './services/route';
 const assets = require(process.env.RAZZLE_ASSETS_MANIFEST);
 
 const server = express();
@@ -15,17 +15,7 @@ server
           origin,
           destination,
       } = req.query;
-      makeRoute(origin, destination).then((route) => {
-         res.status(200).send(route); 
-      })
-  })
-  .get('/route-v2', (req, res) => {
-      const {
-          origin,
-          destination,
-          includeTransitMode,
-      } = req.query;
-      makeRouteV2(origin, destination, { includeTransitMode: JSON.parse(includeTransitMode) }).then((result) => {
+      makeRoute(origin, destination).then((result) => {
          res.status(200).send(result); 
       })
   })
