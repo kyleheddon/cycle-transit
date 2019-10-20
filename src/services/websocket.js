@@ -1,15 +1,25 @@
 import WebSocket from 'ws';
 import { makeRoute } from './route';
-const wss = new WebSocket.Server({ port: process.env.WEBSOCKET_PORT });
 import {
 	MAKE_ROUTE_STATUS_UPDATE,
 	MAKE_ROUTE_COMPLETE,
 } from '../constants/websocket-messages';
+
 const Endpoints = {
 	makeRoute: handleMakeRoute,
 }
 
-wss.on('connection', (ws) => {
+export default (server) => {
+	const wss = new WebSocket.Server({ server });
+
+	wss.on('connection', (ws) => {
+		console.log('connected');
+		handleMessages(ws);
+		ws.on('close', () => console.log('Client disconnected'));
+	});
+}
+
+function handleMessages(ws) {
 	ws.on('message', (rawMessage) => {
 		const message = parseRawMessage(rawMessage);
 		if (Endpoints[message.endpoint]) {
@@ -23,7 +33,7 @@ wss.on('connection', (ws) => {
 			console.log('unknown message:', message);
 		}
 	});
-});
+}
 
 function parseRawMessage(rawMessage) {
 	try {

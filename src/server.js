@@ -4,7 +4,6 @@ import { StaticRouter } from 'react-router-dom';
 import express from 'express';
 import { renderToString } from 'react-dom/server';
 import { makeRoute } from './services/route';
-import './services/websocket';
 const assets = require(process.env.RAZZLE_ASSETS_MANIFEST);
 
 const server = express();
