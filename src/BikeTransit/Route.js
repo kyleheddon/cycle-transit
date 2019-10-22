@@ -20,9 +20,6 @@ export default ({
 	lastRoute,
 	destination,
 }) => {
-	const summary = route.routes[0].summary;
-	const distance = route.routes[0].legs[0].distance.text;
-
 	const summary = getSummary(route.routes[0], nextRoute, lastRoute, destination, isTransit);
 	const distance = route.routes[0].legs[0].distance.text;
 
