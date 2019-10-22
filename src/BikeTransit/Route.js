@@ -1,5 +1,4 @@
 import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import Stepper from '@material-ui/core/Stepper';
@@ -13,14 +12,6 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 const MODE_TRANSIT = 'transit';
 const MODE_BICYCLING = 'bicycling';
 
-const useStyles = makeStyles(theme => ({
-	root: {
-		padding: theme.spacing(3, 2),
-		marginTop: theme.spacing(1),
-		marginBottom: theme.spacing(1),
-	},
-}));
-
 export default ({
 	route,
 	icon,
@@ -29,7 +20,8 @@ export default ({
 	lastRoute,
 	destination,
 }) => {
-	const classes = useStyles();
+	const summary = route.routes[0].summary;
+	const distance = route.routes[0].legs[0].distance.text;
 
 	const summary = getSummary(route.routes[0], nextRoute, lastRoute, destination, isTransit);
 	const distance = route.routes[0].legs[0].distance.text;
