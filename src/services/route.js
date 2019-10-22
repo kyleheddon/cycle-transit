@@ -15,9 +15,21 @@ import {
 const Cache = {}
 const useCache = false;
 
-export async function makeRoute(origin, destination, updateProgress = () => {}) {
-	if (useCache && Cache[cacheKey(origin, destination)]) {
-		return Promise.resolve(Cache[cacheKey(origin, destination)]);
+export async function makeRoute(origin, destination, updateProgress = () => {}, options) {
+	if (useCache && Cache[cacheKey(origin, destination, options)]) {
+		return Promise.resolve(Cache[cacheKey(origin, destination, options)]);
+	}
+
+	if (options && options.bikeOnly) {
+		const result = await queryMapsApi(origin, destination, MODE_BICYCLING);
+		const duration = result.routes[0].legs[0].duration.value;
+		const route = {
+			...result,
+			arrivalTime: moment().add(duration, 's').format('h:mm a'),
+		}
+		Cache[cacheKey(origin, destination, options)] = route;
+
+		return route;
 	}
 
 	// get full route
@@ -25,7 +37,7 @@ export async function makeRoute(origin, destination, updateProgress = () => {}) 
 	updateProgress(INITIAL_ROUTE_COMPLETE);
 
 	const { steps } = route.routes[0].legs[0];
-	const departureTime = route.routes[0].legs[0].departure_time.value;
+	const departureTime = moment().valueOf();
 	const startOfTransit = locationToString(steps[0].end_location);
 	const endOfTransit = locationToString(steps[steps.length - 2].end_location);
 	// get start bicycle route
@@ -37,7 +49,7 @@ export async function makeRoute(origin, destination, updateProgress = () => {}) 
 	const transitRoute = await queryMapsApi(startOfTransit, endOfTransit, MODE_TRANSIT, { departure_time: firstBikeArrivalTime });
 	updateProgress(TRANSIT_LEG_COMPLETE);
 	
-	const transitArrivalTime = firstBikeArrivalTime + transitRoute.routes[0].legs[0].duration.value;
+	const transitArrivalTime = transitRoute.routes[0].legs[0].arrival_time.value;
 	// get end bicycle route
 	const lastBikeRoute = await queryMapsApi(endOfTransit, destination, MODE_BICYCLING, { departure_time: transitArrivalTime });
 	updateProgress(LAST_BIKE_LEG_COMPLETE);
@@ -54,12 +66,12 @@ export async function makeRoute(origin, destination, updateProgress = () => {}) 
 		duration: arrivalMoment.from(departureMoment, true),
 	};
 
-	Cache[cacheKey(origin, destination)] = routes;
+	Cache[cacheKey(origin, destination, options)] = routes;
 	return routes;
 }
 
-function cacheKey(origin, destination) {
-	return `origin="${origin}", destination="${destination}"`
+function cacheKey(origin, destination, options) {
+	return `origin="${origin}", destination="${destination}, options=${JSON.stringify(options)}"`;
 }
 
 function locationToString(location) {

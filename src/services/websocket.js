@@ -47,19 +47,23 @@ function handleMakeRoute(params, ws) {
 	const {
 		origin,
 		destination,
+		options,
+		requestKey,
 	} = params;
 	
 	const updateProgress = (status) => {
 		ws.send(JSON.stringify({
 			status: MAKE_ROUTE_STATUS_UPDATE,
-			status
+			status,
+			requestKey,
 		}));
 	}
 
-	makeRoute(origin, destination, updateProgress).then((result) => {
+	makeRoute(origin, destination, updateProgress, options).then((result) => {
 		ws.send(JSON.stringify({
 			status: MAKE_ROUTE_COMPLETE,
 			result,
+			requestKey,
 		}));
 	});
 }
