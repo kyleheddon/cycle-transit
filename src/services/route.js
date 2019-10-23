@@ -67,6 +67,10 @@ async function makeMixedRoute(origin, destination, updateProgress, options) {
 		transitRoute,
 		lastBikeRoute,
 		arrivalTime,
+		stations: {
+			origin: originStation.name,
+			destination: destinationStation.name,
+		},
 		duration: getDurationFromNow(arrivalTime),
 	};
 }

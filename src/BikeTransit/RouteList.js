@@ -11,7 +11,7 @@ const RouteList = ({
 	mixedRoute,
 }) => {
 	let bikeRouteDuration, bikeRouteDistance, bikeRouteArrivalTime;
-	let mixedRouteDuration, mixedRouteDistance, mixedRouteArrivalTime;
+	let mixedRouteDuration, mixedRouteDistance, mixedRouteArrivalTime, mixedRouteIconTitle;
 	
 	if (bikeRoute) {
 		const bikeRouteLeg = bikeRoute.routes[0].legs[0];
@@ -23,6 +23,7 @@ const RouteList = ({
 	if (mixedRoute) {
 		mixedRouteDuration = mixedRoute.duration;
 		mixedRouteArrivalTime = mixedRoute.arrivalTime;
+		mixedRouteIconTitle = `${mixedRoute.stations.origin} to ${mixedRoute.stations.destination}`;
 	}
 
 	return (
@@ -39,7 +40,9 @@ const RouteList = ({
 				icon={
 					<>
 						<DirectionsBikeIcon />
-						<TrainIcon />
+						<span title={mixedRouteIconTitle}>
+							<TrainIcon />
+						</span>
 					</>
 				}
 			/>
