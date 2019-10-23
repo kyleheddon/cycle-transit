@@ -15,7 +15,7 @@ import {
 	LAST_BIKE_LEG_COMPLETE,
 } from '../constants/route-progress';
 const Cache = {}
-const useCache = false;
+const useCache = true;
 
 export async function makeRoute(origin, destination, updateProgress = () => {}, options) {
 	if (useCache && Cache[cacheKey(origin, destination, options)]) {

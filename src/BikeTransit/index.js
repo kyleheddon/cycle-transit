@@ -54,6 +54,8 @@ export default () => {
 						<RouteList
 							bikeRoute={bikeRoute}
 							mixedRoute={mixedRoute}
+							origin={origin}
+							destination={destination}
 						/>
 					);
 				}

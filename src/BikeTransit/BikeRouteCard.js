@@ -3,6 +3,7 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardActionArea from '@material-ui/core/CardActionArea';
 import Typography from '@material-ui/core/Typography';
+import DirectionsBikeIcon from '@material-ui/icons/DirectionsBike';
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles(theme => ({
@@ -23,17 +24,29 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-const RouteCard = ({
-	distance,
-	duration,
-	arrivalTime,
-	icon,
-	onClick,
-	children,
+const BikeRouteCard = ({
+	route,
 }) => {
 	const classes = useStyles();
+
+	let duration, distance, arrivalTime, onClickProp = {};
 	
-	const onClickProp = onClick ? { onClick } : {};
+	if (route) {
+		const leg = route.routes[0].legs[0];
+		duration = leg.duration.text;
+		distance = leg.distance.text;
+		arrivalTime = route.arrivalTime;
+		onClickProp.onClick = () => {
+			const {
+				start_address,
+				end_address,
+			} = route.routes[0].legs[0];
+			const url = `https://www.google.com/maps/dir/?api=1&origin=${start_address}&destination=${end_address}&travelmode=bicycling`;
+
+			const win = window.open(url, '_blank');
+			win.focus();
+		};
+	}
 
 	return (
 		<Card className={classes.card}>
@@ -41,7 +54,7 @@ const RouteCard = ({
 				<CardContent>
 					<Typography>
 						<>
-							{icon}
+							<DirectionsBikeIcon />
 							<span className={classes.duration}>{duration}</span>
 							<span className={classes.arrivalTime}>{arrivalTime}</span>
 							{distance
@@ -52,8 +65,8 @@ const RouteCard = ({
 					</Typography>
 				</CardContent>
 			</CardActionArea>
-		</Card>
+		</Card>	
 	);
 }
 
-export default RouteCard;
+export default BikeRouteCard;
