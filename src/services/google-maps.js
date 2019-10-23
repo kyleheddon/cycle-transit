@@ -2,10 +2,14 @@ import * as https from 'https';
 export const MODE_TRANSIT = 'transit';
 export const MODE_BICYCLING = 'bicycling';
 export const TRANSIT_MODE_RAIL = 'rail';
-const API_URL = 'https://maps.googleapis.com/maps/api/directions/json';
 const { GOOGLE_MAP_API_DEV_KEY } = process.env;
+const API_BASE_URL = 'https://maps.googleapis.com/maps/api';
+const DIRECTIONS_API_URL = `${API_BASE_URL}/directions/json?key=${GOOGLE_MAP_API_DEV_KEY}`;
+const NEARBY_PLACES_API_URL = `${API_BASE_URL}/place/nearbysearch/json?key=${GOOGLE_MAP_API_DEV_KEY}`;
+const FIND_PLACE_API_URL = `${API_BASE_URL}/place/findplacefromtext/json?key=${GOOGLE_MAP_API_DEV_KEY}`;
+const PLACE_DETAILS_API_URL = `${API_BASE_URL}/place/details/json?key=${GOOGLE_MAP_API_DEV_KEY}`;
 
-export function queryMapsApi(origin, destination, mode, optionalParams = {}) {
+export function queryDirections(origin, destination, mode, optionalParams = {}) {
 	const options = { ...optionalParams };
 	if (mode === MODE_TRANSIT) {
 		options.transit_mode = TRANSIT_MODE_RAIL;
@@ -14,8 +18,22 @@ export function queryMapsApi(origin, destination, mode, optionalParams = {}) {
 	const optionsString = Object.keys(options).reduce((acc, key) => {
 		return `${acc}&${key}=${options[key]}`;
 	}, '');
-	const url = API_URL + `?origin=${origin}&destination=${destination}&mode=${mode}&key=${GOOGLE_MAP_API_DEV_KEY}${optionsString}`;
+	const url = `${DIRECTIONS_API_URL}&origin=${origin}&destination=${destination}&mode=${mode}${optionsString}`;
 
+	return getJson(url);
+}
+
+export function findPlace(searchString) {
+	const url = `${FIND_PLACE_API_URL}&inputtype=textquery&input=${searchString}`;
+	return getJson(url);
+}
+
+export function getPlaceDetails(placeId) {
+	const url = `${PLACE_DETAILS_API_URL}&place_id=${placeId}`;
+	return getJson(url);
+}
+
+export function getJson(url) {
 	return new Promise((resolve) => {
 		https.get(url, (res) => {
 			let rawData = '';
