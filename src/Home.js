@@ -12,9 +12,9 @@ function Home() {
         <div>
             <CssBaseline />
             <AppBar color="default">
-                <Typography variant="h2" component="h1">
+                <Typography variant="h3" component="h1">
                     <Link href="/" color="inherit">
-                        Atlanta Bike + Transit
+                        Atl Bike + Transit
                     </Link>
                 </Typography>
             </AppBar>
