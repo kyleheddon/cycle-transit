@@ -1,7 +1,6 @@
 import React, { useState, Fragment } from 'react';
 import Form from './Form';
-import Route from './Route';
-import RoutePreview from './RoutePreview';
+import RouteList from './RouteList';
 import { makeRoute } from './api';
 import { Progress } from '../constants/route-progress';
 
@@ -10,7 +9,8 @@ export default () => {
 		origin: 'Willow Lane, Decatur',
 		destination: 'Ponce City Market',
 	});
-	const [route, setRoute] = useState(null);
+	const [mixedRoute, setMixedRoute] = useState(null);
+	const [bikeRoute, setBikeRoute] = useState(null);
 	const [loading, setLoading] = useState(false);
 	const [loadingStep, setLoadingStep] = useState(0);
 
@@ -20,39 +20,46 @@ export default () => {
 		includeTransitMode,
 	} = formParams;
 
-	if (route === null) {
-		return (
-			<Fragment>
-				<Form
-					origin={origin}
-					destination={destination}
-					loading={loading}
-					loadingStep={loadingStep}
-					onChange={(updates) => setFormParams({
-						...formParams,
-						...updates,
-					})}
-					onSubmit={() => {
-						setLoading(true);
-						const onUpdate = ({ status }) => {
-							setLoadingStep(Progress.indexOf(status));
-						}
-						makeRoute(origin, destination, onUpdate).then((route) => {
-							setRoute(route);
-							setLoading(false);
-						});
-					}}
-				/>
-			</Fragment>
-		);
-	} else {
-		return (
-			<RoutePreview
-				{...route}
-				includeTransitMode={includeTransitMode}
+	return (
+		<>
+			<Form
 				origin={origin}
 				destination={destination}
+				loading={loading}
+				loadingStep={loadingStep}
+				bikeRoute={bikeRoute}
+				mixedRoute={mixedRoute}
+				onChange={(updates) => setFormParams({
+					...formParams,
+					...updates,
+				})}
+				onSubmit={() => {
+					setLoading(true);
+					const onUpdate = () => {
+						setLoadingStep(loadingStep + 1);
+					}
+					return Promise.all([
+						makeRoute(origin, destination, onUpdate, { bikeOnly: true }).then((route) => {
+							setBikeRoute(route);
+						}),
+						makeRoute(origin, destination, onUpdate, { bikeOnly: false }).then((route) => {
+							setMixedRoute(route);
+						})
+					]);
+				}}
 			/>
-		);
-	}
+			{(() => {
+				if (loading || bikeRoute && mixedRoute) {
+					return (
+						<RouteList
+							bikeRoute={bikeRoute}
+							mixedRoute={mixedRoute}
+							origin={origin}
+							destination={destination}
+						/>
+					);
+				}
+			})()}
+		</>
+	);
 }

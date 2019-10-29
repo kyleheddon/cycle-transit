@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import BikeTransit from './BikeTransit';
 import Typography from '@material-ui/core/Typography';
+import Link from '@material-ui/core/Link';
 import Container from '@material-ui/core/Container';
 import AppBar from '@material-ui/core/AppBar';
 import { makeStyles } from '@material-ui/core/styles';
@@ -11,13 +12,15 @@ function Home() {
         <div>
             <CssBaseline />
             <AppBar color="default">
-                <Typography variant="h2" component="h1">
-                    Bike Transit
+                <Typography variant="h3" component="h1">
+                    <Link href="/" color="inherit">
+                        Atl Bike + Transit
+                    </Link>
                 </Typography>
             </AppBar>
             <Container
                 style={{
-                    paddingTop: 80,
+                    paddingTop: 70,
                 }}
             >
                 <BikeTransit />

@@ -2,7 +2,9 @@ import {
 	MODE_TRANSIT,
 	MODE_BICYCLING,
 	TRANSIT_MODE_RAIL,
-	queryMapsApi,
+	queryDirections,
+	findPlace,
+	getPlaceDetails,
 } from './google-maps';
 import moment from 'moment';
 
@@ -13,53 +15,111 @@ import {
 	LAST_BIKE_LEG_COMPLETE,
 } from '../constants/route-progress';
 const Cache = {}
-const useCache = false;
+const useCache = process.env['USE_GOOGLE_MAPS_CACHE'];
 
-export async function makeRoute(origin, destination, updateProgress = () => {}) {
-	if (useCache && Cache[cacheKey(origin, destination)]) {
-		return Promise.resolve(Cache[cacheKey(origin, destination)]);
+export async function makeRoute(origin, destination, updateProgress = () => {}, options) {
+	if (useCache && Cache[cacheKey(origin, destination, options)]) {
+		return Promise.resolve(Cache[cacheKey(origin, destination, options)]);
 	}
-
-	// get full route
-	const route = await queryMapsApi(origin, destination, MODE_TRANSIT);
-	updateProgress(INITIAL_ROUTE_COMPLETE);
-
-	const { steps } = route.routes[0].legs[0];
-	const departureTime = route.routes[0].legs[0].departure_time.value;
-	const startOfTransit = locationToString(steps[0].end_location);
-	const endOfTransit = locationToString(steps[steps.length - 2].end_location);
-	// get start bicycle route
-	const firstBikeRoute = await queryMapsApi(origin, startOfTransit, MODE_BICYCLING);
-	updateProgress(FIRST_BIKE_LEG_COMPLETE);
-
-	const firstBikeArrivalTime = departureTime + firstBikeRoute.routes[0].legs[0].duration.value;
-	// get transit route
-	const transitRoute = await queryMapsApi(startOfTransit, endOfTransit, MODE_TRANSIT, { departure_time: firstBikeArrivalTime });
-	updateProgress(TRANSIT_LEG_COMPLETE);
 	
-	const transitArrivalTime = firstBikeArrivalTime + transitRoute.routes[0].legs[0].duration.value;
-	// get end bicycle route
-	const lastBikeRoute = await queryMapsApi(endOfTransit, destination, MODE_BICYCLING, { departure_time: transitArrivalTime });
-	updateProgress(LAST_BIKE_LEG_COMPLETE);
+	const result = await options && options.bikeOnly
+		? makeBikeRoute(origin, destination)
+		: makeMixedRoute(origin, destination, updateProgress, options);
+
+	Cache[cacheKey(origin, destination, options)] = result;
+	return result;
+}
+
+async function makeBikeRoute(origin, destination) {
+	const result = await queryDirections(origin, destination, MODE_BICYCLING);
+	const duration = result.routes[0].legs[0].duration.value;
+	return {
+		...result,
+		arrivalTime: moment().add(duration, 's').format('h:mm a'),
+	}
+}
+
+async function makeMixedRoute(origin, destination, updateProgress, options) {
+	const [originStation, destinationStation] = await Promise.all([
+		findNearbyRailStation(origin),
+		findNearbyRailStation(destination)
+	]);
 	
-	const arrivalTime = transitArrivalTime + lastBikeRoute.routes[0].legs[0].duration.value;
+	console.log({
+		originStation: originStation.name,
+		destinationStation: destinationStation.name,
+	});
+
+	const [firstBikeRoute, lastBikeRoute] = await Promise.all([
+		makeBikeRoute(origin, originStation.name),
+		// assumes last bike route will have the same duration if queried at time of transit arrival
+		makeBikeRoute(destinationStation.name, destination)
+	]);
+
+	const transitRoute = await getTransitRoute(originStation, destinationStation, {
+		departureTime: firstBikeRoute.arrivalTime
+	});
+
+	const arrivalTime = calculateArrivalTime(transitRoute, lastBikeRoute);
 	
-	const arrivalMoment = moment.unix(arrivalTime);
-	const departureMoment = moment.unix(departureTime);
-	const routes = {
+	return {
 		firstBikeRoute,
 		transitRoute,
 		lastBikeRoute,
-		arrivalTime: arrivalMoment.format('h:mm a'),
-		duration: arrivalMoment.from(departureMoment, true),
+		arrivalTime,
+		stations: {
+			origin: originStation.name,
+			destination: destinationStation.name,
+		},
+		duration: getDurationFromNow(arrivalTime),
 	};
-
-	Cache[cacheKey(origin, destination)] = routes;
-	return routes;
 }
 
-function cacheKey(origin, destination) {
-	return `origin="${origin}", destination="${destination}"`
+function getDurationFromNow(arrivalTime) {
+	const arrival = moment(arrivalTime, 'h:mm a');
+	const now = moment();
+
+	const days = arrival.diff(now, 'days');
+	const hours = arrival.subtract(days, 'days').diff(now, 'hours');
+	const minutes = arrival.subtract(hours, 'hours').diff(now, 'minutes');
+
+	if (hours) {
+		return `${hours} hrs ${minutes} mins`;
+	} else {
+		return `${minutes} mins`;
+	}
+}
+
+function getTransitRoute(originStation, destinationStation, options) {
+	const { departureTime } = options;
+	return queryDirections(originStation.name, destinationStation.name, MODE_TRANSIT, {
+		departure_time: moment(departureTime, 'h:mm a').unix()
+	});
+}
+
+function calculateArrivalTime(transitRoute, lastBikeRoute) {
+	const bikeDuration = lastBikeRoute.routes[0].legs[0].duration.value;
+	const transitArrivalTime = transitRoute.routes[0].legs[0].arrival_time.value;
+	return moment.unix(transitArrivalTime).add(bikeDuration, 's').format('h:mm a')
+}
+
+async function findNearbyRailStation(location) {
+	const searchString = `Marta sations near ${location}`;
+	const placeResults = await findPlace(searchString);
+
+	if (!placeResults.candidates || !placeResults.candidates.length) {
+		console.log('no place candidates for ' + location);
+		return [];
+	}
+	
+	const placeId = placeResults.candidates[0].place_id;
+
+	const results = await getPlaceDetails(placeId);
+	return results.result;
+}
+
+function cacheKey(origin, destination, options) {
+	return `origin="${origin}", destination="${destination}, options=${JSON.stringify(options)}"`;
 }
 
 function locationToString(location) {

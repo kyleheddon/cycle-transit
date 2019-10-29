@@ -12,22 +12,34 @@ import {
 	MAKE_ROUTE_COMPLETE,
 } from '../constants/websocket-messages';
 
-export function makeRoute(origin, destination, onUpdate) {
+export function makeRoute(origin, destination, onUpdate, options = {}) {
 	return new Promise((resolve, reject) => {
+		const requestKey = JSON.stringify({
+			origin,
+			destination,
+			options,
+			timestamp: (new Date().getTime()),
+		});
+
 		makeRouteWebsocket(origin, destination, (message) => {
+			if (message.requestKey !== requestKey) {
+				return;
+			}
 			if (message.status === MAKE_ROUTE_COMPLETE) {
 				resolve(message.result);
 			} else {
 				onUpdate(message);
 			}
-		});
+		}, options, requestKey);
 	});
 }
 
-export function makeRouteWebsocket(origin, destination, onUpdate) {
+export function makeRouteWebsocket(origin, destination, onUpdate, options, requestKey) {
 	socket.send('makeRoute', {
 		origin,
 		destination,
+		options,
+		requestKey,
 	});
 	socket.onMessage(onUpdate);
 }

@@ -13,7 +13,7 @@ export default (server) => {
 	const wss = new WebSocket.Server({ server });
 
 	wss.on('connection', (ws) => {
-		console.log('connected');
+		console.log('client connected');
 		handleMessages(ws);
 		ws.on('close', () => console.log('Client disconnected'));
 	});
@@ -23,7 +23,7 @@ function handleMessages(ws) {
 	ws.on('message', (rawMessage) => {
 		const message = parseRawMessage(rawMessage);
 		if (Endpoints[message.endpoint]) {
-			console.log('handing endpoint:', message.endpoint, message.payload);
+			console.log('handing endpoint:', message.endpoint);
 			try {
 				Endpoints[message.endpoint](message.payload, ws);
 			} catch (e) {
@@ -47,19 +47,23 @@ function handleMakeRoute(params, ws) {
 	const {
 		origin,
 		destination,
+		options,
+		requestKey,
 	} = params;
 	
 	const updateProgress = (status) => {
 		ws.send(JSON.stringify({
 			status: MAKE_ROUTE_STATUS_UPDATE,
-			status
+			status,
+			requestKey,
 		}));
 	}
 
-	makeRoute(origin, destination, updateProgress).then((result) => {
+	makeRoute(origin, destination, updateProgress, options).then((result) => {
 		ws.send(JSON.stringify({
 			status: MAKE_ROUTE_COMPLETE,
 			result,
+			requestKey,
 		}));
 	});
 }

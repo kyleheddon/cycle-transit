@@ -5,7 +5,11 @@ import Input from '@material-ui/core/Input';
 import TextField from '@material-ui/core/TextField';
 import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
-import LinearProgress from '@material-ui/core/LinearProgress';
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
+import Typography from '@material-ui/core/Typography';
+import TripOriginIcon from '@material-ui/icons/TripOrigin';
+import PlaceIcon from '@material-ui/icons/Place';
 import { Progress } from '../constants/route-progress';
 
 export default ({
@@ -15,54 +19,60 @@ export default ({
 	onSubmit,
 	loading,
 	loadingStep,
+	bikeRoute,
+	mixedRoute,
 }) => {
-	const loadingProgress = ((loadingStep) / Progress.length) * 100;
+
+	if (loading || bikeRoute || mixedRoute) {
+		return (
+			<Typography variant="h5" component="h2">
+				<TripOriginIcon /> {origin}
+				<br />
+				<PlaceIcon /> {destination}
+			</Typography>
+		);
+	}
 
 	return (
-		<>
-			{(loading &&
-				<LinearProgress variant="determinate" value={loadingProgress} />
-			)}
-			<form
-				id="route_form"
-				onSubmit={(event) => {
-					event.preventDefault();
-					onSubmit();
-				}}
-			>
-				<FormGroup>
-					<div>
-						<TextField
-							type="text"
-							value={origin}
-							label="Origin"
-							disabled={loading}
-							onChange={(event) => onChange({
-								origin: event.target.value,
-							})}
-						/>
-					</div>
-					<div>
-						<TextField
-							type="text"
-							value={destination}
-							label="Destination"
-							onChange={(event) => onChange({
-								destination: event.target.value,
-							})}
-						/>
-					</div>
-					<div style={{ marginTop: '1rem' }}>
-						<Button
-							form="route_form"
-							type="submit"
-							variant="contained"
-						>
-							Route
-						</Button>
-					</div>
-				</FormGroup>
-			</form>
-		</>
+		<form
+			id="route_form"
+			onSubmit={(event) => {
+				event.preventDefault();
+				onSubmit();
+			}}
+		>
+			<FormGroup>
+				<div>
+					<TextField
+						type="text"
+						value={origin}
+						label="Origin"
+						disabled={loading}
+						onChange={(event) => onChange({
+							origin: event.target.value,
+						})}
+					/>
+				</div>
+				<div>
+					<TextField
+						type="text"
+						value={destination}
+						label="Destination"
+						onChange={(event) => onChange({
+							destination: event.target.value,
+						})}
+					/>
+				</div>
+				<div style={{ marginTop: '1rem' }}>
+					<Button
+						form="route_form"
+						type="submit"
+						variant="contained"
+					>
+						Route
+					</Button>
+				</div>
+			</FormGroup>
+		</form>
 	);
 }
