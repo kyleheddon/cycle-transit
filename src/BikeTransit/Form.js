@@ -11,10 +11,16 @@ import Typography from '@material-ui/core/Typography';
 import TripOriginIcon from '@material-ui/icons/TripOrigin';
 import PlaceIcon from '@material-ui/icons/Place';
 import { Progress } from '../constants/route-progress';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
 
-export default ({
+const Form = ({
 	onChange,
+	onTextInput,
 	origin,
+	originOptions,
+	destinationOptions,
+	onSelectOption,
 	destination,
 	onSubmit,
 	loading,
@@ -48,20 +54,55 @@ export default ({
 						value={origin}
 						label="Origin"
 						disabled={loading}
-						onChange={(event) => onChange({
-							origin: event.target.value,
-						})}
+						onChange={(event) => {
+							const { value } = event.target;
+							onChange({
+								origin: value,
+							});
+							onTextInput('origin', value);
+						}}
 					/>
+					<List>
+						{originOptions.map(option => (
+							<ListItem
+								key={option.id}
+								button
+								onClick={() => {
+									onSelectOption('origin', option.description);
+								}}
+							>
+								{option.description}
+							</ListItem>
+						))}
+					</List>
 				</div>
 				<div>
 					<TextField
 						type="text"
 						value={destination}
 						label="Destination"
-						onChange={(event) => onChange({
-							destination: event.target.value,
-						})}
+						onChange={(event) => {
+							const { value } = event.target;
+							onChange({
+								destination: value,
+							});
+							onTextInput('destination', value);
+						}}
 					/>
+				
+					<List>
+						{destinationOptions.map(option => (
+							<ListItem
+								key={option.id}
+								button
+								onClick={() => {
+									onSelectOption('destination', option.description);
+								}}
+							>
+								{option.description}
+							</ListItem>
+						))}
+					</List>
 				</div>
 				<div style={{ marginTop: '1rem' }}>
 					<Button
@@ -76,3 +117,5 @@ export default ({
 		</form>
 	);
 }
+
+export default Form;

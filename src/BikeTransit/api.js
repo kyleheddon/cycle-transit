@@ -34,7 +34,13 @@ export function makeRoute(origin, destination, onUpdate, options = {}) {
 	});
 }
 
-export function makeRouteWebsocket(origin, destination, onUpdate, options, requestKey) {
+export function locationAutoComplete(str) {
+	return fetch(`locationAutoComplete?str=${str}`).then((response) => {
+		return response.json();
+	});
+}
+
+function makeRouteWebsocket(origin, destination, onUpdate, options, requestKey) {
 	socket.send('makeRoute', {
 		origin,
 		destination,
