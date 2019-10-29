@@ -4,11 +4,19 @@ import CardContent from '@material-ui/core/CardContent';
 import CardActionArea from '@material-ui/core/CardActionArea';
 import Typography from '@material-ui/core/Typography';
 import DirectionsBikeIcon from '@material-ui/icons/DirectionsBike';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles(theme => ({
 	card: {
 		marginTop: theme.spacing(1),
+	},
+	cardContent: {
+		paddingLeft: theme.spacing(3),
+		paddingRight: theme.spacing(3),
+		paddingTop: theme.spacing(2),
+		paddingBottom: theme.spacing(2),
+		display: 'flex',
 	},
 	distance: {
 		marginLeft: theme.spacing(0.5),
@@ -22,6 +30,9 @@ const useStyles = makeStyles(theme => ({
 		marginLeft: theme.spacing(1),
 		fontWeight: 700,
 	},
+	progress: {
+		marginLeft: theme.spacing(1.75),
+	}
 }));
 
 const BikeRouteCard = ({
@@ -29,13 +40,9 @@ const BikeRouteCard = ({
 }) => {
 	const classes = useStyles();
 
-	let duration, distance, arrivalTime, onClickProp = {};
+	let onClickProp = {};
 	
 	if (route) {
-		const leg = route.routes[0].legs[0];
-		duration = leg.duration.text;
-		distance = leg.distance.text;
-		arrivalTime = route.arrivalTime;
 		onClickProp.onClick = () => {
 			const {
 				start_address,
@@ -51,18 +58,32 @@ const BikeRouteCard = ({
 	return (
 		<Card className={classes.card}>
 			<CardActionArea {...onClickProp}>
-				<CardContent>
-					<Typography>
-						<>
-							<DirectionsBikeIcon />
-							<span className={classes.duration}>{duration}</span>
-							<span className={classes.arrivalTime}>{arrivalTime}</span>
-							{distance
-								? <span className={classes.distance}>({distance})</span>
-								: null
-							}
-						</>
-					</Typography>
+				<CardContent className={classes.cardContent}>
+					<DirectionsBikeIcon />
+					{(() => {
+						if (!route) {
+							return <CircularProgress
+								className={classes.progress}
+								color="inherit"
+								size="1.75rem"
+							/>;
+						}
+
+						const leg = route.routes[0].legs[0];
+						const duration = leg.duration.text;
+						const distance = leg.distance.text;
+						const arrivalTime = route.arrivalTime;
+						
+						return (
+							<Typography component="span">
+								<>
+									<span className={classes.duration}>{duration}</span>
+									<span className={classes.arrivalTime}>{arrivalTime}</span>
+									<span className={classes.distance}>({distance})</span>
+								</>
+							</Typography>
+						);
+					})()}
 				</CardContent>
 			</CardActionArea>
 		</Card>	

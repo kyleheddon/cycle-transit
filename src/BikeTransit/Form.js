@@ -5,10 +5,11 @@ import Input from '@material-ui/core/Input';
 import TextField from '@material-ui/core/TextField';
 import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
-import LinearProgress from '@material-ui/core/LinearProgress';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
+import TripOriginIcon from '@material-ui/icons/TripOrigin';
+import PlaceIcon from '@material-ui/icons/Place';
 import { Progress } from '../constants/route-progress';
 
 export default ({
@@ -23,19 +24,12 @@ export default ({
 }) => {
 
 	if (loading || bikeRoute || mixedRoute) {
-		const loadingProgress = ((loadingStep) / Progress.length) * 100;
-
 		return (
-			<>
-				<LinearProgress variant="determinate" value={loadingProgress} />
-				<Card>
-					<CardContent>
-						<Typography variant="h5" component="h2">
-							From {origin} to {destination}
-						</Typography>
-					</CardContent>
-				</Card>
-			</>
+			<Typography variant="h5" component="h2">
+				<TripOriginIcon /> {origin}
+				<br />
+				<PlaceIcon /> {destination}
+			</Typography>
 		);
 	}
 

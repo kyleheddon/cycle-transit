@@ -14,6 +14,8 @@ import DirectionsBikeIcon from '@material-ui/icons/DirectionsBike';
 import TrainIcon from '@material-ui/icons/Train';
 import TripOriginIcon from '@material-ui/icons/TripOrigin';
 import PlaceIcon from '@material-ui/icons/Place';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import AddIcon from '@material-ui/icons/Add';
 import { makeStyles } from '@material-ui/core/styles';
 import {
 	Walking,
@@ -23,6 +25,10 @@ import {
 const useStyles = makeStyles(theme => ({
 	card: {
 		marginTop: theme.spacing(1),
+	},
+	summary: {
+		paddingTop: theme.spacing(0.5),
+		paddingBottom: theme.spacing(0),
 	},
 	distance: {
 		marginLeft: theme.spacing(0.5),
@@ -38,7 +44,14 @@ const useStyles = makeStyles(theme => ({
 	},
 	button: {
 		textAlign: 'left',
-	}
+	},
+	progress: {
+		marginLeft: theme.spacing(1.75),
+	},
+	stepper: {
+		padding: 0,
+		paddingLeft: theme.spacing(2)
+	},
 }));
 
 
@@ -49,35 +62,40 @@ const MixedRouteCard = ({
 }) => {
 	const [activeStep, setActiveStep] = useState(0);
 	const classes = useStyles();
-	let duration, distance, arrivalTime, iconTitle, onClick;
-
-	if (route) {
-		duration = route.duration;
-		arrivalTime = route.arrivalTime;
-		iconTitle = `${route.stations.origin} to ${route.stations.destination}`;
-	}
 
 	return (
-		<ExpansionPanel>
+		<ExpansionPanel className={classes.card}>
 			<ExpansionPanelSummary
+				className={classes.summary}
 				expandIcon={route ? <ExpandMoreIcon /> : null}
 			>
-				<Typography>
-					<>
-						<>
-							<DirectionsBikeIcon />
-							<span title={iconTitle}>
-								<TrainIcon />
-							</span>
-						</>
-						<span className={classes.duration}>{duration}</span>
-						<span className={classes.arrivalTime}>{arrivalTime}</span>
-						{distance
-							? <span className={classes.distance}>({distance})</span>
-							: null
+					<DirectionsBikeIcon />
+					<AddIcon />
+					<span title={route ? `${route.stations.origin} to ${route.stations.destination}` : ''}>
+						<TrainIcon />
+					</span>
+					{(() => {
+						if (!route) {
+							return <CircularProgress
+								className={classes.progress}
+								color="inherit"
+								size="1.75rem"
+							/>;
 						}
-					</>
-				</Typography>
+
+						return (
+							<Typography component="span">
+								<>
+									<span className={classes.duration}>
+										{route.duration}
+									</span>
+									<span className={classes.arrivalTime}>
+										{route.arrivalTime}
+									</span>
+								</>
+							</Typography>
+						);
+					})()}
 			</ExpansionPanelSummary>
 			{(() => {
 				if (!route) {
@@ -110,9 +128,13 @@ const MixedRouteCard = ({
 
 				return (
 					<ExpansionPanelDetails>
-						<Stepper activeStep={activeStep} orientation="vertical" nonLinear>
+						<Stepper
+							className={classes.stepper}
+							activeStep={activeStep}
+							orientation="vertical"
+							nonLinear
+						>
 							<Step>
-								
 								{activeStep === 0
 									? (
 										<StepLabel icon={<DirectionsBikeIcon />}>
@@ -130,14 +152,10 @@ const MixedRouteCard = ({
 										className={classes.button}
 										onClick={openTab(origin, stations.origin, 'bicycling')}
 									>
-										<Typography>
+										<Typography component="span">
 											<TripOriginIcon fontSize="small" /> {origin}
 											<br />
-											<PlaceIcon fontSize="small"/>
-											<span> </span>
-											<span>
-												{stations.origin}
-											</span>
+											<PlaceIcon fontSize="small"/> {stations.origin}
 										</Typography>
 									</StepButton>
 								</StepContent>
@@ -160,19 +178,15 @@ const MixedRouteCard = ({
 										className={classes.button}
 										onClick={openTab(stations.origin, stations.destination, 'transit')}
 									>
-										<Typography>
+										<Typography component="span">
 											<span title={`${originStationLine.name} Line`}>
 												<TripOriginIcon fontSize="small" style={{ color: originStationLine.color }}/>
-												<span
-													style={{ color: originStationLine.color }}
-												> {stations.origin}</span>
+												<span> {stations.origin}</span>
 											</span>
 											<br />
 											<span title={`${destinationStationLine.name} Line`}>
 												<PlaceIcon fontSize="small" style={{ color: destinationStationLine.color }} />
-												<span
-													style={{ color: destinationStationLine.color }}
-												> {stations.destination}</span>
+												<span> {stations.destination}</span>
 											</span>
 										</Typography>
 									</StepButton>
@@ -196,12 +210,8 @@ const MixedRouteCard = ({
 										className={classes.button}
 										onClick={openTab(stations.destination, destination, 'bicycling')}
 									>
-										<Typography>
-											<TripOriginIcon fontSize="small" />
-											<span> </span>
-											<span>
-												{stations.origin}
-											</span>
+										<Typography component="span">
+											<TripOriginIcon fontSize="small" /> {stations.origin}
 											<br />
 											<PlaceIcon fontSize="small" /> {destination}
 										</Typography>

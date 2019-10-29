@@ -20,7 +20,7 @@ function Home() {
             </AppBar>
             <Container
                 style={{
-                    paddingTop: 80,
+                    paddingTop: 70,
                 }}
             >
                 <BikeTransit />
