@@ -54,6 +54,7 @@ const Form = ({
 						value={origin}
 						label="Origin"
 						disabled={loading}
+						fullWidth
 						onChange={(event) => {
 							const { value } = event.target;
 							onChange({
@@ -81,6 +82,7 @@ const Form = ({
 						type="text"
 						value={destination}
 						label="Destination"
+						fullWidth
 						onChange={(event) => {
 							const { value } = event.target;
 							onChange({
