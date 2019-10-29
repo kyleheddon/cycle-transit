@@ -211,7 +211,7 @@ const MixedRouteCard = ({
 										onClick={openTab(stations.destination, destination, 'bicycling')}
 									>
 										<Typography component="span">
-											<TripOriginIcon fontSize="small" /> {stations.origin}
+											<TripOriginIcon fontSize="small" /> {stations.destination}
 											<br />
 											<PlaceIcon fontSize="small" /> {destination}
 										</Typography>
