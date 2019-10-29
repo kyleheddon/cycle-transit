@@ -15,14 +15,14 @@ import {
 	LAST_BIKE_LEG_COMPLETE,
 } from '../constants/route-progress';
 const Cache = {}
-const useCache = true;
+const useCache = process.env['USE_GOOGLE_MAPS_CACHE'];
 
 export async function makeRoute(origin, destination, updateProgress = () => {}, options) {
 	if (useCache && Cache[cacheKey(origin, destination, options)]) {
 		return Promise.resolve(Cache[cacheKey(origin, destination, options)]);
 	}
 	
-	const result = options && options.bikeOnly
+	const result = await options && options.bikeOnly
 		? makeBikeRoute(origin, destination)
 		: makeMixedRoute(origin, destination, updateProgress, options);
 
@@ -90,7 +90,7 @@ function getDurationFromNow(arrivalTime) {
 	}
 }
 
-async function getTransitRoute(originStation, destinationStation, options) {
+function getTransitRoute(originStation, destinationStation, options) {
 	const { departureTime } = options;
 	return queryDirections(originStation.name, destinationStation.name, MODE_TRANSIT, {
 		departure_time: moment(departureTime, 'h:mm a').unix()
@@ -114,7 +114,8 @@ async function findNearbyRailStation(location) {
 	
 	const placeId = placeResults.candidates[0].place_id;
 
-	return getPlaceDetails(placeId).then(results => results.result);
+	const results = await getPlaceDetails(placeId);
+	return results.result;
 }
 
 function cacheKey(origin, destination, options) {

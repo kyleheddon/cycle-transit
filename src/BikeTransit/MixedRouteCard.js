@@ -15,6 +15,10 @@ import TrainIcon from '@material-ui/icons/Train';
 import TripOriginIcon from '@material-ui/icons/TripOrigin';
 import PlaceIcon from '@material-ui/icons/Place';
 import { makeStyles } from '@material-ui/core/styles';
+import {
+	Walking,
+	Transit,
+} from '../constants/travel-modes';
 
 const useStyles = makeStyles(theme => ({
 	card: {
@@ -32,6 +36,9 @@ const useStyles = makeStyles(theme => ({
 		marginLeft: theme.spacing(1),
 		fontWeight: 700,
 	},
+	button: {
+		textAlign: 'left',
+	}
 }));
 
 
@@ -86,7 +93,9 @@ const MixedRouteCard = ({
 				
 				const firstBikeRouteLeg = firstBikeRoute.routes[0].legs[0];
 				const lastBikeRouteLeg = lastBikeRoute.routes[0].legs[0];
-				const numStops = 6;
+				const numStops = getNumberOfStops(transitRoute);
+				const originStationLine = getLine(stations.origin, transitRoute);
+				const destinationStationLine = getLine(stations.destination, transitRoute);
 				
 				const handleStep = (step) => () => {
 					setActiveStep(step);
@@ -117,11 +126,18 @@ const MixedRouteCard = ({
 									)
 								}
 								<StepContent>
-									<StepButton onClick={openTab(origin, stations.origin, 'bicycling')}>
+									<StepButton
+										className={classes.button}
+										onClick={openTab(origin, stations.origin, 'bicycling')}
+									>
 										<Typography>
 											<TripOriginIcon fontSize="small" /> {origin}
 											<br />
-											<PlaceIcon fontSize="small" /> {stations.origin}
+											<PlaceIcon fontSize="small"/>
+											<span> </span>
+											<span>
+												{stations.origin}
+											</span>
 										</Typography>
 									</StepButton>
 								</StepContent>
@@ -140,11 +156,24 @@ const MixedRouteCard = ({
 									)
 								}
 								<StepContent>
-									<StepButton onClick={openTab(stations.origin, stations.destination, 'transit')}>
+									<StepButton
+										className={classes.button}
+										onClick={openTab(stations.origin, stations.destination, 'transit')}
+									>
 										<Typography>
-											<TripOriginIcon fontSize="small" /> {stations.origin}
+											<span title={`${originStationLine.name} Line`}>
+												<TripOriginIcon fontSize="small" style={{ color: originStationLine.color }}/>
+												<span
+													style={{ color: originStationLine.color }}
+												> {stations.origin}</span>
+											</span>
 											<br />
-											<PlaceIcon fontSize="small" /> {stations.destination}
+											<span title={`${destinationStationLine.name} Line`}>
+												<PlaceIcon fontSize="small" style={{ color: destinationStationLine.color }} />
+												<span
+													style={{ color: destinationStationLine.color }}
+												> {stations.destination}</span>
+											</span>
 										</Typography>
 									</StepButton>
 								</StepContent>
@@ -163,9 +192,16 @@ const MixedRouteCard = ({
 									)
 								}
 								<StepContent>
-									<StepButton onClick={openTab(stations.destination, destination, 'bicycling')}>
+									<StepButton
+										className={classes.button}
+										onClick={openTab(stations.destination, destination, 'bicycling')}
+									>
 										<Typography>
-											<TripOriginIcon fontSize="small" /> {stations.destination}
+											<TripOriginIcon fontSize="small" />
+											<span> </span>
+											<span>
+												{stations.origin}
+											</span>
 											<br />
 											<PlaceIcon fontSize="small" /> {destination}
 										</Typography>
@@ -178,6 +214,40 @@ const MixedRouteCard = ({
 			})()}
 		</ExpansionPanel>
 	);
+}
+
+function getLine(stationName, transitRoute) {
+	const steps = getTransitSteps(transitRoute);
+	for (let step of steps) {
+		if (step.travel_mode !== Transit) {
+			continue;
+		}
+		const {
+			departure_stop,
+			arrival_stop,
+			line,
+		} = step.transit_details;
+		if (departure_stop.name === stationName || arrival_stop.name === stationName) {
+			return line;
+		}
+	}
+
+	return 'initial';
+}
+
+function getNumberOfStops(transitRoute) {
+	const steps = getTransitSteps(transitRoute);
+	
+	return steps.reduce((numStops, step) => {
+		if (step.travel_mode === Transit) {
+			return numStops + step.transit_details.num_stops;
+		}
+		return numStops;
+	}, 0);
+}
+
+function getTransitSteps(transitRoute) {
+	return transitRoute.routes[0].legs[0].steps;
 }
 
 export default MixedRouteCard;
