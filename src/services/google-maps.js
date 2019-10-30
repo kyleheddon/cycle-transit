@@ -35,7 +35,7 @@ export function getPlaceDetails(placeId) {
 }
 
 export function autoComplete(str) {
-	const url = `${AUTO_COMPLETE_API_URL}&input=${str}&location=Atlanta+Ga+USA`;
+	const url = `${AUTO_COMPLETE_API_URL}&input=${str}&location=Atlanta+Ga&radius=50`;
 	return getJson(url);
 }
 
