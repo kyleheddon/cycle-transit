@@ -1,7 +1,11 @@
 import React, { useState, useCallback } from 'react';
 import Form from './Form';
 import RouteList from './RouteList';
-import { makeRoute, locationAutoComplete } from './api';
+import {
+	makeRoute,
+	locationAutoComplete,
+	reverseGeocode,
+} from './api';
 import { Progress } from '../constants/route-progress';
 import { debounce } from './util';
 
@@ -32,6 +36,27 @@ export default () => {
 				setDestinationOptions(results.predictions);
 			}
 		})
+	}
+	
+	function handleUseCurrentLocationClick() {
+		window.navigator.geolocation.getCurrentPosition((position) => {
+			const {
+				latitude,
+				longitude,
+			} = position.coords;
+			reverseGeocode(latitude, longitude).then((result) => {
+				const {
+					city,
+					state,
+					street,
+				} = result;
+				
+				setFormParams({
+					...formParams,
+					origin: `${street}, ${city}, ${state}`,
+				});
+			});
+		});
 	}
 
 	const {
@@ -81,6 +106,7 @@ export default () => {
 						})
 					]);
 				}}
+				onUseCurrentLocationClick={handleUseCurrentLocationClick}
 			/>
 			{(() => {
 				if (loading || bikeRoute && mixedRoute) {

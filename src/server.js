@@ -4,6 +4,7 @@ import { StaticRouter } from 'react-router-dom';
 import express from 'express';
 import { renderToString } from 'react-dom/server';
 import { autoComplete } from './services/google-maps';
+import { reverseGeocode } from './services/route';
 const assets = require(process.env.RAZZLE_ASSETS_MANIFEST);
 
 const server = express();
@@ -15,6 +16,12 @@ server
       autoComplete(str).then((result) => {
          res.status(200).send(result); 
       })
+  })
+  .get('/reverseGeocode', (req, res) => {
+      const { latitude, longitude } = req.query;
+      reverseGeocode(latitude, longitude).then((result) => {
+         res.status(200).send(result); 
+     });
   })
   .get('/*', (req, res) => {
     const context = {};
