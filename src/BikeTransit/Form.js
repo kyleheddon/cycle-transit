@@ -16,6 +16,7 @@ import PlaceIcon from '@material-ui/icons/Place';
 import { Progress } from '../constants/route-progress';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 const Form = ({
 	onChange,
@@ -31,6 +32,7 @@ const Form = ({
 	bikeRoute,
 	mixedRoute,
 	onUseCurrentLocationClick,
+	loadingCurrentPosition,
 }) => {
 
 	if (loading || bikeRoute || mixedRoute) {
@@ -61,9 +63,7 @@ const Form = ({
 						fullWidth
 						onChange={(event) => {
 							const { value } = event.target;
-							onChange({
-								origin: value,
-							});
+							onChange('origin', value);
 							onTextInput('origin', value);
 						}}
 						InputProps={{
@@ -73,7 +73,7 @@ const Form = ({
 										aria-label="use current location"
 										onClick={onUseCurrentLocationClick}
 									>
-										<NearMeIcon />
+										{loadingCurrentPosition ? <CircularProgress size="1rem" /> : <NearMeIcon />}
 									</IconButton>
 								</InputAdornment>
 							)
@@ -101,9 +101,7 @@ const Form = ({
 						fullWidth
 						onChange={(event) => {
 							const { value } = event.target;
-							onChange({
-								destination: value,
-							});
+							onChange('destination', value);
 							onTextInput('destination', value);
 						}}
 					/>

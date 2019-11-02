@@ -10,10 +10,9 @@ import { Progress } from '../constants/route-progress';
 import { debounce } from './util';
 
 export default () => {
-	const [formParams, setFormParams] = useState({
-		origin: '',
-		destination: '',
-	});
+	const [origin, setOrigin] = useState('');
+	const [destination, setDestination] = useState('');
+	const [loadingCurrentPosition, setLoadingCurrentPosition] = useState('');
 	const [mixedRoute, setMixedRoute] = useState(null);
 	const [bikeRoute, setBikeRoute] = useState(null);
 	const [loading, setLoading] = useState(false);
@@ -39,6 +38,7 @@ export default () => {
 	}
 	
 	function handleUseCurrentLocationClick() {
+		setLoadingCurrentPosition(true);
 		window.navigator.geolocation.getCurrentPosition((position) => {
 			const {
 				latitude,
@@ -51,19 +51,11 @@ export default () => {
 					street,
 				} = result;
 				
-				setFormParams({
-					...formParams,
-					origin: `${street}, ${city}, ${state}`,
-				});
+				setOrigin(`${street}, ${city}, ${state}`);
+				setLoadingCurrentPosition(false);
 			});
 		});
 	}
-
-	const {
-		origin,
-		destination,
-		includeTransitMode,
-	} = formParams;
 
 	return (
 		<>
@@ -76,18 +68,19 @@ export default () => {
 				loadingStep={loadingStep}
 				bikeRoute={bikeRoute}
 				mixedRoute={mixedRoute}
-				onChange={(updates) => setFormParams({
-					...formParams,
-					...updates,
-				})}
-				onSelectOption={(key, value) => {
-					setFormParams({
-						...formParams,
-						[key]: value,
-					});
+				onChange={(key, value) => {
 					if (key === 'origin') {
+						setOrigin(value);
+					} else {
+						setDestination(value);
+					}
+				}}
+				onSelectOption={(key, value) => {
+					if (key === 'origin') {
+						setOrigin(value)
 						setOriginOptions([]);
 					} else {
+						setDestination(value);
 						setDestinationOptions([]);
 					}
 				}}
@@ -107,6 +100,7 @@ export default () => {
 					]);
 				}}
 				onUseCurrentLocationClick={handleUseCurrentLocationClick}
+				loadingCurrentPosition={loadingCurrentPosition}
 			/>
 			{(() => {
 				if (loading || bikeRoute && mixedRoute) {
