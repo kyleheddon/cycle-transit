@@ -1,22 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Button from '@material-ui/core/Button';
 import FormGroup from '@material-ui/core/FormGroup';
-import Input from '@material-ui/core/Input';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import IconButton from '@material-ui/core/IconButton';
 import NearMeIcon from '@material-ui/icons/NearMe';
-import TextField from '@material-ui/core/TextField';
-import Checkbox from '@material-ui/core/Checkbox';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 import TripOriginIcon from '@material-ui/icons/TripOrigin';
 import PlaceIcon from '@material-ui/icons/Place';
 import { Progress } from '../constants/route-progress';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import LocationAutocomplete from './LocationAutocomplete';
+import { blue, } from '@material-ui/core/colors';
 
 const Form = ({
 	onChange,
@@ -34,7 +28,7 @@ const Form = ({
 	onUseCurrentLocationClick,
 	loadingCurrentPosition,
 }) => {
-
+	const [value, setValue] = useState('');
 	if (loading || bikeRoute || mixedRoute) {
 		return (
 			<Typography variant="h5" component="h2">
@@ -55,76 +49,50 @@ const Form = ({
 		>
 			<FormGroup>
 				<div>
-					<TextField
-						type="text"
-						value={origin}
+					<LocationAutocomplete
+						getOptionLabel={option => option.description}
+						options={originOptions}
+						onOptionChange={(option) => {
+							onSelectOption('origin', option ? option.description : '');
+						}}
 						label="Origin"
-						disabled={loading}
-						fullWidth
-						onChange={(event) => {
-							const { value } = event.target;
+						onChange={(value) => {
 							onChange('origin', value);
 							onTextInput('origin', value);
 						}}
-						InputProps={{
-							endAdornment: (
-								<InputAdornment position="end">
-									<IconButton
-										aria-label="use current location"
-										onClick={onUseCurrentLocationClick}
-									>
-										{loadingCurrentPosition ? <CircularProgress size="1rem" /> : <NearMeIcon />}
-									</IconButton>
-								</InputAdornment>
-							)
-						}}
+						endAdornment={
+							<InputAdornment position="end">
+								<IconButton
+									aria-label="use current location"
+									onClick={onUseCurrentLocationClick}
+									style={{ color: blue[600] }}
+								>
+									{loadingCurrentPosition ? <CircularProgress size="1rem" /> : <NearMeIcon />}
+								</IconButton>
+							</InputAdornment>
+						}
 					/>
-					<List>
-						{originOptions.map(option => (
-							<ListItem
-								key={option.id}
-								button
-								onClick={() => {
-									onSelectOption('origin', option.description);
-								}}
-							>
-								{option.description}
-							</ListItem>
-						))}
-					</List>
 				</div>
 				<div>
-					<TextField
-						type="text"
-						value={destination}
+					<LocationAutocomplete
+						getOptionLabel={option => option.description}
+						options={destinationOptions}
+						onOptionChange={(option) => {
+							onSelectOption('destination', option ? option.description : '');
+						}}
 						label="Destination"
-						fullWidth
-						onChange={(event) => {
-							const { value } = event.target;
+						onChange={(value) => {
 							onChange('destination', value);
 							onTextInput('destination', value);
 						}}
 					/>
-				
-					<List>
-						{destinationOptions.map(option => (
-							<ListItem
-								key={option.id}
-								button
-								onClick={() => {
-									onSelectOption('destination', option.description);
-								}}
-							>
-								{option.description}
-							</ListItem>
-						))}
-					</List>
 				</div>
 				<div style={{ marginTop: '1rem' }}>
 					<Button
 						form="route_form"
 						type="submit"
 						variant="contained"
+						disabled={!origin || !destination}
 					>
 						Route
 					</Button>
