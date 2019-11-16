@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import FormGroup from '@material-ui/core/FormGroup';
@@ -35,7 +35,6 @@ const Form = ({
 	onUseCurrentLocationClick,
 	loadingCurrentPosition,
 }) => {
-	const [value, setValue] = useState('');
 	if (loading || bikeRoute || mixedRoute) {
 		return (
 			<Typography variant="h5" component="h2">
