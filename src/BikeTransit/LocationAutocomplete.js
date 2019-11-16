@@ -16,22 +16,19 @@ const useStyles = makeStyles(theme => ({
 
 const LocationAutocomplete = ({
 	options,
-	getOptionLabel,
 	onOptionChange,
 	label,
 	onChange,
+	value,
+	id,
 }) => {
 	const classes = useStyles();
-
 	return (
 		<Autocomplete
-			getOptionLabel={getOptionLabel}
-			filterOptions={x => x}
-			options={options}
-			autoComplete
-			includeInputInList
-			freeSolo
 			disableOpenOnFocus
+			id={id}
+			options={options}
+			value={value}
 			renderInput={params => (
 				<TextField
 					{...params}
@@ -66,7 +63,6 @@ const LocationAutocomplete = ({
 					</Grid>
 				);
 			}}
-			
 			onChange={(event, option) => {
 				onOptionChange(option);
 			}}

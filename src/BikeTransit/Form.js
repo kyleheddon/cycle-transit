@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import FormGroup from '@material-ui/core/FormGroup';
 import InputAdornment from '@material-ui/core/InputAdornment';
@@ -10,7 +11,13 @@ import PlaceIcon from '@material-ui/icons/Place';
 import { Progress } from '../constants/route-progress';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import LocationAutocomplete from './LocationAutocomplete';
-import { blue, } from '@material-ui/core/colors';
+import { makeStyles } from '@material-ui/core/styles';
+
+const useStyles = makeStyles(theme => ({
+	nearMeButton: {
+		marginLeft: theme.spacing(1),
+	},
+}));
 
 const Form = ({
 	onChange,
@@ -38,6 +45,8 @@ const Form = ({
 			</Typography>
 		);
 	}
+	
+	const classes = useStyles();
 
 	return (
 		<form
@@ -48,34 +57,37 @@ const Form = ({
 			}}
 		>
 			<FormGroup>
+				<Grid container alignItems="flex-end">
+					<Grid item xs>
+						<LocationAutocomplete
+							options={originOptions}
+							onOptionChange={(option) => {
+								onSelectOption('origin', option ? option.description : '');
+							}}
+							label="Origin"
+							onChange={(value) => {
+								onChange('origin', value);
+								onTextInput('origin', value);
+							}}
+							value={origin}
+							id="origin_autocomplete"
+						/>
+					</Grid>
+					<Grid item>
+						<Button
+							aria-label="use current location"
+							onClick={onUseCurrentLocationClick}
+							color="primary"
+							variant="contained"
+							className={classes.nearMeButton}
+						>
+							
+							{loadingCurrentPosition ? <CircularProgress color="white" size="1rem" /> : <NearMeIcon fontSize="small" />}
+						</Button>
+					</Grid>
+				</Grid>
 				<div>
 					<LocationAutocomplete
-						getOptionLabel={option => option.description}
-						options={originOptions}
-						onOptionChange={(option) => {
-							onSelectOption('origin', option ? option.description : '');
-						}}
-						label="Origin"
-						onChange={(value) => {
-							onChange('origin', value);
-							onTextInput('origin', value);
-						}}
-						endAdornment={
-							<InputAdornment position="end">
-								<IconButton
-									aria-label="use current location"
-									onClick={onUseCurrentLocationClick}
-									style={{ color: blue[600] }}
-								>
-									{loadingCurrentPosition ? <CircularProgress size="1rem" /> : <NearMeIcon />}
-								</IconButton>
-							</InputAdornment>
-						}
-					/>
-				</div>
-				<div>
-					<LocationAutocomplete
-						getOptionLabel={option => option.description}
 						options={destinationOptions}
 						onOptionChange={(option) => {
 							onSelectOption('destination', option ? option.description : '');
@@ -85,6 +97,8 @@ const Form = ({
 							onChange('destination', value);
 							onTextInput('destination', value);
 						}}
+						id="destination_autocomplete"
+						value={destination}
 					/>
 				</div>
 				<div style={{ marginTop: '1rem' }}>
