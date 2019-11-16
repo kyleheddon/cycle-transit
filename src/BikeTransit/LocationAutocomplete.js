@@ -29,6 +29,7 @@ const LocationAutocomplete = ({
 			id={id}
 			options={options}
 			value={value}
+			freeSolo
 			renderInput={params => (
 				<TextField
 					{...params}
