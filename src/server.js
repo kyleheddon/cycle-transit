@@ -3,21 +3,25 @@ import React from 'react';
 import { StaticRouter } from 'react-router-dom';
 import express from 'express';
 import { renderToString } from 'react-dom/server';
-import { makeRoute } from './services/route';
+import { autoComplete } from './services/google-maps';
+import { reverseGeocode } from './services/route';
 const assets = require(process.env.RAZZLE_ASSETS_MANIFEST);
 
 const server = express();
 server
   .disable('x-powered-by')
   .use(express.static(process.env.RAZZLE_PUBLIC_DIR))
-  .get('/route', (req, res) => {
-      const {
-          origin,
-          destination,
-      } = req.query;
-      makeRoute(origin, destination).then((result) => {
+  .get('/locationAutoComplete', (req, res) => {
+      const { str } = req.query;
+      autoComplete(str).then((result) => {
          res.status(200).send(result); 
       })
+  })
+  .get('/reverseGeocode', (req, res) => {
+      const { latitude, longitude } = req.query;
+      reverseGeocode(latitude, longitude).then((result) => {
+         res.status(200).send(result); 
+     });
   })
   .get('/*', (req, res) => {
     const context = {};

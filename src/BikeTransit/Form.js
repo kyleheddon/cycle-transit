@@ -1,28 +1,41 @@
-import React from 'react';
+import React, { useState } from 'react';
+import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import FormGroup from '@material-ui/core/FormGroup';
-import Input from '@material-ui/core/Input';
-import TextField from '@material-ui/core/TextField';
-import Checkbox from '@material-ui/core/Checkbox';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import IconButton from '@material-ui/core/IconButton';
+import NearMeIcon from '@material-ui/icons/NearMe';
 import Typography from '@material-ui/core/Typography';
 import TripOriginIcon from '@material-ui/icons/TripOrigin';
 import PlaceIcon from '@material-ui/icons/Place';
 import { Progress } from '../constants/route-progress';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import LocationAutocomplete from './LocationAutocomplete';
+import { makeStyles } from '@material-ui/core/styles';
 
-export default ({
+const useStyles = makeStyles(theme => ({
+	nearMeButton: {
+		marginLeft: theme.spacing(1),
+	},
+}));
+
+const Form = ({
 	onChange,
+	onTextInput,
 	origin,
+	originOptions,
+	destinationOptions,
+	onSelectOption,
 	destination,
 	onSubmit,
 	loading,
 	loadingStep,
 	bikeRoute,
 	mixedRoute,
+	onUseCurrentLocationClick,
+	loadingCurrentPosition,
 }) => {
-
+	const [value, setValue] = useState('');
 	if (loading || bikeRoute || mixedRoute) {
 		return (
 			<Typography variant="h5" component="h2">
@@ -32,6 +45,8 @@ export default ({
 			</Typography>
 		);
 	}
+	
+	const classes = useStyles();
 
 	return (
 		<form
@@ -42,25 +57,48 @@ export default ({
 			}}
 		>
 			<FormGroup>
+				<Grid container alignItems="flex-end">
+					<Grid item xs>
+						<LocationAutocomplete
+							options={originOptions}
+							onOptionChange={(option) => {
+								onSelectOption('origin', option ? option.description : '');
+							}}
+							label="Origin"
+							onChange={(value) => {
+								onChange('origin', value);
+								onTextInput('origin', value);
+							}}
+							value={origin}
+							id="origin_autocomplete"
+						/>
+					</Grid>
+					<Grid item>
+						<Button
+							aria-label="use current location"
+							onClick={onUseCurrentLocationClick}
+							color="primary"
+							variant="contained"
+							className={classes.nearMeButton}
+						>
+							
+							{loadingCurrentPosition ? <CircularProgress color="white" size="1rem" /> : <NearMeIcon fontSize="small" />}
+						</Button>
+					</Grid>
+				</Grid>
 				<div>
-					<TextField
-						type="text"
-						value={origin}
-						label="Origin"
-						disabled={loading}
-						onChange={(event) => onChange({
-							origin: event.target.value,
-						})}
-					/>
-				</div>
-				<div>
-					<TextField
-						type="text"
-						value={destination}
+					<LocationAutocomplete
+						options={destinationOptions}
+						onOptionChange={(option) => {
+							onSelectOption('destination', option ? option.description : '');
+						}}
 						label="Destination"
-						onChange={(event) => onChange({
-							destination: event.target.value,
-						})}
+						onChange={(value) => {
+							onChange('destination', value);
+							onTextInput('destination', value);
+						}}
+						id="destination_autocomplete"
+						value={destination}
 					/>
 				</div>
 				<div style={{ marginTop: '1rem' }}>
@@ -68,6 +106,7 @@ export default ({
 						form="route_form"
 						type="submit"
 						variant="contained"
+						disabled={!origin || !destination}
 					>
 						Route
 					</Button>
@@ -76,3 +115,5 @@ export default ({
 		</form>
 	);
 }
+
+export default Form;

@@ -13,3 +13,13 @@ function flattenSteps(step) {
 		return step;
 	}
 }
+
+export function debounce(func, timeout) {
+	let timeoutId = null;
+	return (...args) => {
+		window.clearTimeout(timeoutId);
+		timeoutId = window.setTimeout(() => {
+			func(...args);
+		}, timeout);
+	}
+}

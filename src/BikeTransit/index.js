@@ -1,38 +1,90 @@
-import React, { useState, Fragment } from 'react';
+import React, { useState, useCallback } from 'react';
 import Form from './Form';
 import RouteList from './RouteList';
-import { makeRoute } from './api';
+import {
+	makeRoute,
+	locationAutoComplete,
+	reverseGeocode,
+} from './api';
 import { Progress } from '../constants/route-progress';
+import { debounce } from './util';
 
 export default () => {
-	const [formParams, setFormParams] = useState({
-		origin: 'Willow Lane, Decatur',
-		destination: 'Ponce City Market',
-	});
+	const [origin, setOrigin] = useState('');
+	const [destination, setDestination] = useState('');
+	const [loadingCurrentPosition, setLoadingCurrentPosition] = useState('');
 	const [mixedRoute, setMixedRoute] = useState(null);
 	const [bikeRoute, setBikeRoute] = useState(null);
 	const [loading, setLoading] = useState(false);
 	const [loadingStep, setLoadingStep] = useState(0);
-
-	const {
-		origin,
-		destination,
-		includeTransitMode,
-	} = formParams;
+	const [originOptions, setOriginOptions] = useState([]);
+	const [destinationOptions, setDestinationOptions] = useState([]);
+	const debounceOnTextInput = useCallback(debounce(onTextInput, 400), []);
+	
+	function onTextInput(key, value) {
+		if (!value.trim()) {
+			return;
+		}
+		locationAutoComplete(value.trim()).then((results) => {
+			if (results.status !== 'OK') {
+				return;
+			}
+			if (key === 'origin') {
+				setOriginOptions(results.predictions);
+			} else {
+				setDestinationOptions(results.predictions);
+			}
+		})
+	}
+	
+	function handleUseCurrentLocationClick() {
+		setLoadingCurrentPosition(true);
+		window.navigator.geolocation.getCurrentPosition((position) => {
+			const {
+				latitude,
+				longitude,
+			} = position.coords;
+			reverseGeocode(latitude, longitude).then((result) => {
+				const {
+					city,
+					state,
+					street,
+				} = result;
+				
+				setOrigin(`${street}, ${city}, ${state}`);
+				setLoadingCurrentPosition(false);
+			});
+		});
+	}
 
 	return (
 		<>
 			<Form
 				origin={origin}
+				originOptions={originOptions}
 				destination={destination}
+				destinationOptions={destinationOptions}
 				loading={loading}
 				loadingStep={loadingStep}
 				bikeRoute={bikeRoute}
 				mixedRoute={mixedRoute}
-				onChange={(updates) => setFormParams({
-					...formParams,
-					...updates,
-				})}
+				onChange={(key, value) => {
+					if (key === 'origin') {
+						setOrigin(value);
+					} else {
+						setDestination(value);
+					}
+				}}
+				onSelectOption={(key, value) => {
+					if (key === 'origin') {
+						setOrigin(value)
+						setOriginOptions([]);
+					} else {
+						setDestination(value);
+						setDestinationOptions([]);
+					}
+				}}
+				onTextInput={debounceOnTextInput}
 				onSubmit={() => {
 					setLoading(true);
 					const onUpdate = () => {
@@ -47,6 +99,8 @@ export default () => {
 						})
 					]);
 				}}
+				onUseCurrentLocationClick={handleUseCurrentLocationClick}
+				loadingCurrentPosition={loadingCurrentPosition}
 			/>
 			{(() => {
 				if (loading || bikeRoute && mixedRoute) {

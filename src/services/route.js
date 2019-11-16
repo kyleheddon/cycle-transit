@@ -6,6 +6,7 @@ import {
 	findPlace,
 	getPlaceDetails,
 } from './google-maps';
+import { reverseGeocode as mapQuestReverseGeocode } from './map-quest';
 import moment from 'moment';
 
 import {
@@ -124,4 +125,29 @@ function cacheKey(origin, destination, options) {
 
 function locationToString(location) {
 	return location.lat + ',' + location.lng;
+}
+
+export function reverseGeocode(latitude, longitude) {
+	return mapQuestReverseGeocode(latitude, longitude).then((result) => {
+		if (result.info.statuscode !== 0) {
+			throw 'reverseGeocode failed';
+		}
+		
+		try {
+			const location = result.results[0].locations[0];
+			const {
+				street,
+				adminArea3: state,
+				adminArea5: city,
+			} = location;
+			
+			return {
+				street,
+				state,
+				city,
+			}
+		} catch (e) {
+			throw 'reverseGeocode failed';
+		}
+	});
 }

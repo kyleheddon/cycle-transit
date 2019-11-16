@@ -1,4 +1,4 @@
-import * as https from 'https';
+import { getJson } from './base-api';
 export const MODE_TRANSIT = 'transit';
 export const MODE_BICYCLING = 'bicycling';
 export const TRANSIT_MODE_RAIL = 'rail';
@@ -8,6 +8,8 @@ const DIRECTIONS_API_URL = `${API_BASE_URL}/directions/json?key=${GOOGLE_MAP_API
 const NEARBY_PLACES_API_URL = `${API_BASE_URL}/place/nearbysearch/json?key=${GOOGLE_MAP_API_DEV_KEY}`;
 const FIND_PLACE_API_URL = `${API_BASE_URL}/place/findplacefromtext/json?key=${GOOGLE_MAP_API_DEV_KEY}`;
 const PLACE_DETAILS_API_URL = `${API_BASE_URL}/place/details/json?key=${GOOGLE_MAP_API_DEV_KEY}`;
+const AUTO_COMPLETE_API_URL = `${API_BASE_URL}/place/autocomplete/json?key=${GOOGLE_MAP_API_DEV_KEY}`;
+const ATLANTA_LAT_LON = '33.7489954,-84.3879824';
 
 export function queryDirections(origin, destination, mode, optionalParams = {}) {
 	const options = { ...optionalParams };
@@ -33,15 +35,7 @@ export function getPlaceDetails(placeId) {
 	return getJson(url);
 }
 
-export function getJson(url) {
-	return new Promise((resolve) => {
-		https.get(url, (res) => {
-			let rawData = '';
-			res.setEncoding('utf8');
-			res.on('data', (chunk) => { rawData += chunk; });
-			res.on('end', () => {
-				resolve(JSON.parse(rawData));
-			});
-		});
-	});
+export function autoComplete(str) {
+	const url = `${AUTO_COMPLETE_API_URL}&input=${str}&location=${ATLANTA_LAT_LON}&radius=50`;
+	return getJson(url);
 }
