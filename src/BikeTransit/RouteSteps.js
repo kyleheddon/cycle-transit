@@ -35,6 +35,7 @@ const RouteSteps = ({
 	const firstBikeRouteLeg = firstBikeRoute.routes[0].legs[0];
 	const lastBikeRouteLeg = lastBikeRoute.routes[0].legs[0];
 	const numStops = getNumberOfStops(transitRoute);
+	const departureTime = transitRoute.routes[0].legs[0].departure_time.text;
 
 	const handleStep = (step) => () => {
 		setActiveStep(step);
@@ -60,7 +61,7 @@ const RouteSteps = ({
 			<RouteStep
 				isActive={activeStep === 1}
 				icon={<TrainIcon />}
-				label={`${numStops} stops`}
+				label={`${numStops} stops. Departs at ${departureTime}`}
 				onClick={handleStep(1)}
 				origin={stations.origin}
 				destination={stations.destination}
