@@ -38,6 +38,10 @@ const LocationAutocomplete = ({
 						onChange(event.target.value);
 					}}
 					fullWidth
+					inputProps={{
+						...params.inputProps,
+						autocomplete: "disabled",
+					}}
 				/>
 			)}
 			renderOption={option => {
