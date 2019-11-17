@@ -40,7 +40,7 @@ const LocationAutocomplete = ({
 					fullWidth
 					inputProps={{
 						...params.inputProps,
-						autocomplete: "disabled",
+						autoComplete: "off",
 					}}
 				/>
 			)}

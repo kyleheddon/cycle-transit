@@ -10,6 +10,7 @@ import { makeStyles } from '@material-ui/core/styles';
 const useStyles = makeStyles(theme => ({
 	logo: {
 		padding: theme.spacing(0.5),
+		paddingLeft: theme.spacing(1),
 	}
 }));
 
@@ -27,7 +28,7 @@ const Home = () => {
 			</AppBar>
 			<Container
 				style={{
-					paddingTop: 70,
+					paddingTop: '4rem',
 				}}
 			>
 				<BikeTransit />

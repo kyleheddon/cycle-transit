@@ -17,8 +17,9 @@ const RouteSteps = ({
 	route,
 	origin,
 	destination,
+	activeStep,
+	setActiveStep,
 }) => {
-	const [activeStep, setActiveStep] = useState(0);
 	const classes = useStyles();
 
 	if (!route) {

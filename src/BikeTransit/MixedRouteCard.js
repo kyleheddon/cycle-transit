@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Typography from '@material-ui/core/Typography';
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
@@ -38,10 +38,17 @@ const MixedRouteCard = ({
 	origin,
 	destination,
 }) => {
+	const [activeStep, setActiveStep] = useState(-1);
 	const classes = useStyles();
+	const closeStepper = () => {
+		setActiveStep(-1);
+	}
 
 	return (
-		<ExpansionPanel className={classes.card}>
+		<ExpansionPanel
+			className={classes.card}
+			onChange={closeStepper}
+		>
 			<ExpansionPanelSummary
 				className={classes.summary}
 				expandIcon={route ? <ExpandMoreIcon /> : null}
@@ -80,6 +87,8 @@ const MixedRouteCard = ({
 						route={route}
 						origin={origin}
 						destination={destination}
+						activeStep={activeStep}
+						setActiveStep={setActiveStep}
 					/>
 				</ExpansionPanelDetails>
 			)}
