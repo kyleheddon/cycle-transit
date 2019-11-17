@@ -10,8 +10,8 @@ import { Progress } from '../constants/route-progress';
 import { debounce } from './util';
 
 export default () => {
-	const [origin, setOrigin] = useState('417 Willow Lane, Decatur, GA, USA');
-	const [destination, setDestination] = useState('Derry Avenue Southwest, Atlanta, GA, USA');
+	const [origin, setOrigin] = useState('');
+	const [destination, setDestination] = useState('');
 	const [loadingCurrentPosition, setLoadingCurrentPosition] = useState('');
 	const [mixedRoute, setMixedRoute] = useState(null);
 	const [bikeRoute, setBikeRoute] = useState(null);

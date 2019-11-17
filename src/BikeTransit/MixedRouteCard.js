@@ -74,7 +74,6 @@ const MixedRouteCard = ({
 						);
 					})()}
 			</ExpansionPanelSummary>
-			
 			{route && (
 				<ExpansionPanelDetails>
 					<RouteSteps
