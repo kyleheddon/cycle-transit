@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import Typography from '@material-ui/core/Typography';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
@@ -9,7 +9,7 @@ import TripOriginIcon from '@material-ui/icons/TripOrigin';
 import PlaceIcon from '@material-ui/icons/Place';
 import Map from './Map';
 
-const RouteStep = ({
+const RouteStep = forwardRef(({
 	isActive,
 	label,
 	icon,
@@ -19,9 +19,13 @@ const RouteStep = ({
 	url,
 	route,
 	...props,
-}) => {
+}, ref) => {
+	const handleClick = () => {
+		onClick(ref);
+	}
+
 	return (
-		<Step {...props}>
+		<Step {...props} ref={ref}>
 			{isActive
 				? (
 					<StepLabel icon={icon}>
@@ -29,7 +33,7 @@ const RouteStep = ({
 					</StepLabel>
 				)
 				: (
-					<StepButton icon={icon} onClick={onClick}>
+					<StepButton icon={icon} onClick={handleClick}>
 						{label}
 					</StepButton>
 				)
@@ -46,6 +50,6 @@ const RouteStep = ({
 			</StepContent>
 		</Step>
 	);
-}
+});
 
 export default RouteStep;

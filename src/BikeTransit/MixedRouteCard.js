@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { forwardRef } from 'react';
 import Typography from '@material-ui/core/Typography';
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
@@ -33,26 +33,35 @@ const useStyles = makeStyles(theme => ({
 }));
 
 
-const MixedRouteCard = ({
+const MixedRouteCard = forwardRef(({
 	route,
 	origin,
 	destination,
+	isExpanded,
+	onToggle,
+	activeStep,
+	setActiveStep,
+}, {
+	mixedRef,
+	stepRefs,
 }) => {
-	const [activeStep, setActiveStep] = useState(-1);
 	const classes = useStyles();
-	const closeStepper = () => {
-		setActiveStep(-1);
+	
+	const onChange = (event, isExpanded) => {
+		onToggle(event, isExpanded, mixedRef);
 	}
 
 	return (
 		<ExpansionPanel
 			className={classes.card}
-			onChange={closeStepper}
+			onChange={onChange}
+			expanded={isExpanded}
 		>
 			<ExpansionPanelSummary
 				className={classes.summary}
 				expandIcon={route ? <ExpandMoreIcon /> : null}
 			>
+				<div ref={mixedRef}>
 					<DirectionsBikeIcon />
 					<AddIcon />
 					<span title={route ? `${route.stations.origin} to ${route.stations.destination}` : ''}>
@@ -80,6 +89,7 @@ const MixedRouteCard = ({
 							</Typography>
 						);
 					})()}
+				</div>
 			</ExpansionPanelSummary>
 			{route && (
 				<ExpansionPanelDetails>
@@ -89,11 +99,12 @@ const MixedRouteCard = ({
 						destination={destination}
 						activeStep={activeStep}
 						setActiveStep={setActiveStep}
+						ref={stepRefs}
 					/>
 				</ExpansionPanelDetails>
 			)}
 		</ExpansionPanel>
 	);
-}
+});
 
 export default MixedRouteCard;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
@@ -34,42 +34,54 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-const BikeRouteCard = ({
+const BikeRouteCard = forwardRef(({
 	route,
-}) => {
+	isExpanded,
+	onToggle,
+}, ref) => {
 	const classes = useStyles();
+	
+	const onChange = (event, isExpanded) => {
+		onToggle(event, isExpanded, ref);
+	}
 
 	return (
-		<ExpansionPanel className={classes.card}>
+		<ExpansionPanel
+			className={classes.card}
+			expanded={isExpanded}
+			onChange={onChange}
+		>
 			<ExpansionPanelSummary
 				className={classes.summary}
 				expandIcon={route ? <ExpandMoreIcon /> : null}
 			>
-				<DirectionsBikeIcon />
-				{(() => {
-					if (!route) {
-						return <CircularProgress
-							className={classes.progress}
-							color="inherit"
-							size="1.75rem"
-						/>;
-					}
+				<span ref={ref}>
+					<DirectionsBikeIcon />
+					{(() => {
+						if (!route) {
+							return <CircularProgress
+								className={classes.progress}
+								color="inherit"
+								size="1.75rem"
+							/>;
+						}
 
-					const leg = route.routes[0].legs[0];
-					const duration = leg.duration.text;
-					const distance = leg.distance.text;
-					const arrivalTime = route.arrivalTime;
-					
-					return (
-						<Typography component="span">
-							<>
-								<span className={classes.duration}>{duration}</span>
-								<span className={classes.arrivalTime}>{arrivalTime}</span>
-								<span className={classes.distance}>({distance})</span>
-							</>
-						</Typography>
-					);
-				})()}
+						const leg = route.routes[0].legs[0];
+						const duration = leg.duration.text;
+						const distance = leg.distance.text;
+						const arrivalTime = route.arrivalTime;
+						
+						return (
+							<Typography component="span">
+								<>
+									<span className={classes.duration}>{duration}</span>
+									<span className={classes.arrivalTime}>{arrivalTime}</span>
+									<span className={classes.distance}>({distance})</span>
+								</>
+							</Typography>
+						);
+					})()}
+				</span>
 			</ExpansionPanelSummary>
 			{route && (
 				<ExpansionPanelDetails>
@@ -80,7 +92,7 @@ const BikeRouteCard = ({
 			)}
 		</ExpansionPanel>
 	);
-}
+});
 
 function getUrl(route) {
 	const {

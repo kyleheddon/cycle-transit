@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef } from 'react';
 import Typography from '@material-ui/core/Typography';
 import Stepper from '@material-ui/core/Stepper';
 import DirectionsBikeIcon from '@material-ui/icons/DirectionsBike';
@@ -13,13 +13,13 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-const RouteSteps = ({
+const RouteSteps = forwardRef(({
 	route,
 	origin,
 	destination,
 	activeStep,
 	setActiveStep,
-}) => {
+}, refs) => {
 	const classes = useStyles();
 
 	if (!route) {
@@ -38,8 +38,8 @@ const RouteSteps = ({
 	const numStops = getNumberOfStops(transitRoute);
 	const departureTime = transitRoute.routes[0].legs[0].departure_time.text;
 
-	const handleStep = (step) => () => {
-		setActiveStep(step);
+	const handleStep = (step) => (ref) => {
+		setActiveStep(step, ref);
 	}
 
 	return (
@@ -58,6 +58,7 @@ const RouteSteps = ({
 				destination={stations.origin}
 				url={routeUrl(origin, stations.origin, 'bicycling')}
 				route={firstBikeRoute}
+				ref={refs[0]}
 			/>
 			<RouteStep
 				isActive={activeStep === 1}
@@ -68,6 +69,7 @@ const RouteSteps = ({
 				destination={stations.destination}
 				url={routeUrl(stations.origin, stations.destination, 'transit')}
 				route={transitRoute}
+				ref={refs[1]}
 			/>
 			<RouteStep
 				isActive={activeStep === 2}
@@ -78,10 +80,11 @@ const RouteSteps = ({
 				destination={destination}
 				url={routeUrl(stations.destination, destination, 'bicycling')}
 				route={lastBikeRoute}
+				ref={refs[2]}
 			/>
 		</Stepper>
 	);
-}
+});
 
 function routeUrl(origin, destination, travelMode) {
 	return `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}&travelmode=${travelMode}`;

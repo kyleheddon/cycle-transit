@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import BikeRouteCard from './BikeRouteCard';
 import MixedRouteCard from './MixedRouteCard';
 
@@ -8,14 +8,55 @@ const RouteList = ({
 	origin,
 	destination,
 }) => {
+	const [expandedCard, setExpandedCard] = useState(null);
+	const [activeStep, setActiveStep] = useState(0);
+	const bikeRef = useRef(null);
+	const mixedRef = useRef(null);
+	const stepRefs = [useRef(null), useRef(null), useRef(null)];
+	
+	const handleToggle = (card) => (event, isExpanded, ref) => {
+		setActiveStep(0);
+		setExpandedCard(isExpanded ? card : null);
+		if (isExpanded) {
+			scrollIntoView(ref);
+		}
+	}
+	
+	const handleStepChange = (stepNumber, ref) => {
+		setActiveStep(stepNumber);
+		scrollIntoView(ref);
+	}
+
+	const scrollIntoView = (ref) => {
+		window.setTimeout(() => {
+			window.scrollTo({
+				top: ref.current.offsetTop + 80,
+				left: 0,
+				behavior: 'smooth',
+			});
+		}, 300);
+	}
 
 	return (
 		<>
-			<BikeRouteCard route={bikeRoute} />
+			<BikeRouteCard
+				route={bikeRoute}
+				isExpanded={expandedCard === 'bikeRoute'}
+				onToggle={handleToggle('bikeRoute', bikeRef)}
+				ref={bikeRef}
+			/>
 			<MixedRouteCard
 				route={mixedRoute}
 				origin={origin}
 				destination={destination}
+				isExpanded={expandedCard === 'mixedRoute'}
+				onToggle={handleToggle('mixedRoute', mixedRef)}
+				activeStep={activeStep}
+				setActiveStep={handleStepChange}
+				ref={{
+					mixedRef,
+					stepRefs,
+				}}
 			/>
 		</>
 	);

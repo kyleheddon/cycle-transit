@@ -10,8 +10,8 @@ import { Progress } from '../constants/route-progress';
 import { debounce } from './util';
 
 export default () => {
-	const [origin, setOrigin] = useState('');
-	const [destination, setDestination] = useState('');
+	const [origin, setOrigin] = useState('417 willow lane decatur ga');
+	const [destination, setDestination] = useState('salesforce tower atlanta');
 	const [loadingCurrentPosition, setLoadingCurrentPosition] = useState('');
 	const [mixedRoute, setMixedRoute] = useState(null);
 	const [bikeRoute, setBikeRoute] = useState(null);
@@ -19,7 +19,7 @@ export default () => {
 	const [loadingStep, setLoadingStep] = useState(0);
 	const [originOptions, setOriginOptions] = useState([]);
 	const [destinationOptions, setDestinationOptions] = useState([]);
-	const debounceOnTextInput = useCallback(debounce(onTextInput, 400), []);
+	const debounceOnTextInput = useCallback(debounce(onTextInput, 250), []);
 	
 	function onTextInput(key, value) {
 		if (!value.trim()) {
