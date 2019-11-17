@@ -10,7 +10,6 @@ import RouteStep from './RouteStep';
 const useStyles = makeStyles(theme => ({
 	stepper: {
 		padding: 0,
-		paddingLeft: theme.spacing(2)
 	},
 }));
 
