@@ -54,7 +54,7 @@ const Form = ({
 				event.preventDefault();
 				onSubmit();
 			}}
-			autocomplete="disabled"
+			autoComplete="disabled"
 		>
 			<FormGroup>
 				<Grid container alignItems="flex-end">
