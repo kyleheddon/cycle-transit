@@ -19,7 +19,7 @@ export default () => {
 	const [loadingStep, setLoadingStep] = useState(0);
 	const [originOptions, setOriginOptions] = useState([]);
 	const [destinationOptions, setDestinationOptions] = useState([]);
-	const debounceOnTextInput = useCallback(debounce(onTextInput, 400), []);
+	const debounceOnTextInput = useCallback(debounce(onTextInput, 250), []);
 	
 	function onTextInput(key, value) {
 		if (!value.trim()) {

@@ -1,4 +1,5 @@
 import { getJson } from './base-api';
+import { asyncCache } from './util';
 export const MODE_TRANSIT = 'transit';
 export const MODE_BICYCLING = 'bicycling';
 export const TRANSIT_MODE_RAIL = 'rail';
@@ -9,7 +10,9 @@ const NEARBY_PLACES_API_URL = `${API_BASE_URL}/place/nearbysearch/json?key=${GOO
 const FIND_PLACE_API_URL = `${API_BASE_URL}/place/findplacefromtext/json?key=${GOOGLE_MAP_API_DEV_KEY}`;
 const PLACE_DETAILS_API_URL = `${API_BASE_URL}/place/details/json?key=${GOOGLE_MAP_API_DEV_KEY}`;
 const AUTO_COMPLETE_API_URL = `${API_BASE_URL}/place/autocomplete/json?key=${GOOGLE_MAP_API_DEV_KEY}`;
+const MAP_IMAGE_URL = `${API_BASE_URL}/staticmap?key=${GOOGLE_MAP_API_DEV_KEY}`;
 const ATLANTA_LAT_LON = '33.7489954,-84.3879824';
+const useCache = process.env['USE_GOOGLE_MAPS_CACHE'];
 
 export function queryDirections(origin, destination, mode, optionalParams = {}) {
 	const options = { ...optionalParams };
@@ -22,7 +25,12 @@ export function queryDirections(origin, destination, mode, optionalParams = {}) 
 	}, '');
 	const url = `${DIRECTIONS_API_URL}&origin=${origin}&destination=${destination}&mode=${mode}${optionsString}`;
 
-	return getJson(url);
+	return getJson(url).then((result) => {
+		return {
+			...result,
+			image_base_url: MAP_IMAGE_URL,
+		}
+	});
 }
 
 export function findPlace(searchString) {
@@ -35,7 +43,7 @@ export function getPlaceDetails(placeId) {
 	return getJson(url);
 }
 
-export function autoComplete(str) {
+export const autoComplete = asyncCache((str) => {
 	const url = `${AUTO_COMPLETE_API_URL}&input=${str}&location=${ATLANTA_LAT_LON}&radius=50`;
 	return getJson(url);
-}
+}, useCache);

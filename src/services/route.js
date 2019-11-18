@@ -15,21 +15,14 @@ import {
 	TRANSIT_LEG_COMPLETE,
 	LAST_BIKE_LEG_COMPLETE,
 } from '../constants/route-progress';
-const Cache = {}
+import { asyncCache } from './util';
 const useCache = process.env['USE_GOOGLE_MAPS_CACHE'];
 
-export async function makeRoute(origin, destination, updateProgress = () => {}, options) {
-	if (useCache && Cache[cacheKey(origin, destination, options)]) {
-		return Promise.resolve(Cache[cacheKey(origin, destination, options)]);
-	}
-	
-	const result = await options && options.bikeOnly
+export const makeRoute = asyncCache((origin, destination, updateProgress = () => {}, options) => {
+	return options && options.bikeOnly
 		? makeBikeRoute(origin, destination)
 		: makeMixedRoute(origin, destination, updateProgress, options);
-
-	Cache[cacheKey(origin, destination, options)] = result;
-	return result;
-}
+}, useCache);
 
 async function makeBikeRoute(origin, destination) {
 	const result = await queryDirections(origin, destination, MODE_BICYCLING);
@@ -117,10 +110,6 @@ async function findNearbyRailStation(location) {
 
 	const results = await getPlaceDetails(placeId);
 	return results.result;
-}
-
-function cacheKey(origin, destination, options) {
-	return `origin="${origin}", destination="${destination}, options=${JSON.stringify(options)}"`;
 }
 
 function locationToString(location) {
