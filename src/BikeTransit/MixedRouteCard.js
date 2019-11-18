@@ -41,14 +41,11 @@ const MixedRouteCard = forwardRef(({
 	onToggle,
 	activeStep,
 	setActiveStep,
-}, {
-	mixedRef,
-	stepRefs,
-}) => {
+}, ref) => {
 	const classes = useStyles();
 	
 	const onChange = (event, isExpanded) => {
-		onToggle(event, isExpanded, mixedRef);
+		onToggle(event, isExpanded, ref);
 	}
 
 	return (
@@ -61,7 +58,7 @@ const MixedRouteCard = forwardRef(({
 				className={classes.summary}
 				expandIcon={route ? <ExpandMoreIcon /> : null}
 			>
-				<div ref={mixedRef}>
+				<div ref={ref}>
 					<DirectionsBikeIcon />
 					<AddIcon />
 					<span title={route ? `${route.stations.origin} to ${route.stations.destination}` : ''}>
@@ -99,7 +96,6 @@ const MixedRouteCard = forwardRef(({
 						destination={destination}
 						activeStep={activeStep}
 						setActiveStep={setActiveStep}
-						ref={stepRefs}
 					/>
 				</ExpansionPanelDetails>
 			)}

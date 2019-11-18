@@ -1,4 +1,4 @@
-import React, { useState, forwardRef } from 'react';
+import React, { useState } from 'react';
 import Typography from '@material-ui/core/Typography';
 import Stepper from '@material-ui/core/Stepper';
 import DirectionsBikeIcon from '@material-ui/icons/DirectionsBike';
@@ -13,13 +13,13 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-const RouteSteps = forwardRef(({
+const RouteSteps = ({
 	route,
 	origin,
 	destination,
 	activeStep,
 	setActiveStep,
-}, refs) => {
+}) => {
 	const classes = useStyles();
 
 	if (!route) {
@@ -38,9 +38,7 @@ const RouteSteps = forwardRef(({
 	const numStops = getNumberOfStops(transitRoute);
 	const departureTime = transitRoute.routes[0].legs[0].departure_time.text;
 
-	const handleStep = (step) => (ref) => {
-		setActiveStep(step, ref);
-	}
+	const handleClick = (stepNumber) => () => setActiveStep(stepNumber);
 
 	return (
 		<Stepper
@@ -52,39 +50,36 @@ const RouteSteps = forwardRef(({
 			<RouteStep
 				isActive={activeStep === 0}
 				label={firstBikeRouteLeg.distance.text}
-				onClick={handleStep(0)}
+				onClick={handleClick(0)}
 				icon={<DirectionsBikeIcon />}
 				origin={origin}
 				destination={stations.origin}
 				url={routeUrl(origin, stations.origin, 'bicycling')}
 				route={firstBikeRoute}
-				ref={refs[0]}
 			/>
 			<RouteStep
 				isActive={activeStep === 1}
 				icon={<TrainIcon />}
 				label={`${numStops} stops. Departs at ${departureTime}`}
-				onClick={handleStep(1)}
+				onClick={handleClick(1)}
 				origin={stations.origin}
 				destination={stations.destination}
 				url={routeUrl(stations.origin, stations.destination, 'transit')}
 				route={transitRoute}
-				ref={refs[1]}
 			/>
 			<RouteStep
 				isActive={activeStep === 2}
 				icon={<DirectionsBikeIcon />}
 				label={lastBikeRouteLeg.distance.text}
-				onClick={handleStep(2)}
+				onClick={handleClick(2)}
 				origin={stations.destination}
 				destination={destination}
 				url={routeUrl(stations.destination, destination, 'bicycling')}
 				route={lastBikeRoute}
-				ref={refs[2]}
 			/>
 		</Stepper>
 	);
-});
+}
 
 function routeUrl(origin, destination, travelMode) {
 	return `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}&travelmode=${travelMode}`;

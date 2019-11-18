@@ -12,7 +12,6 @@ const RouteList = ({
 	const [activeStep, setActiveStep] = useState(0);
 	const bikeRef = useRef(null);
 	const mixedRef = useRef(null);
-	const stepRefs = [useRef(null), useRef(null), useRef(null)];
 	
 	const handleToggle = (card) => (event, isExpanded, ref) => {
 		setActiveStep(0);
@@ -20,11 +19,6 @@ const RouteList = ({
 		if (isExpanded) {
 			scrollIntoView(ref);
 		}
-	}
-	
-	const handleStepChange = (stepNumber, ref) => {
-		setActiveStep(stepNumber);
-		scrollIntoView(ref);
 	}
 
 	const scrollIntoView = (ref) => {
@@ -52,11 +46,8 @@ const RouteList = ({
 				isExpanded={expandedCard === 'mixedRoute'}
 				onToggle={handleToggle('mixedRoute', mixedRef)}
 				activeStep={activeStep}
-				setActiveStep={handleStepChange}
-				ref={{
-					mixedRef,
-					stepRefs,
-				}}
+				setActiveStep={setActiveStep}
+				ref={mixedRef}
 			/>
 		</>
 	);
