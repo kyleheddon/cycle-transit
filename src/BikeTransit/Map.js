@@ -14,13 +14,15 @@ const Map = ({
 
 	const polyline = route.routes[0].overview_polyline.points;
 	const markers = getMarkers(route);
-	const key = "AIzaSyCe6EI5E5YOtMtdFmQvLsrt2SC--srIy-w";
-	const url = `https://maps.googleapis.com/maps/api/staticmap
-?key=${key}&size=400x400&path=color:red|weight:5|enc:${polyline}&markers=${markers}`;
-	return <img
-		className={classes.img}
-		src={url}
-	/>;
+	const url = `${route.image_base_url}&size=400x400&path=color:red|weight:5|enc:${polyline}&markers=${markers}`;
+	return (
+		<div>
+			<img
+				className={classes.img}
+				src={url}
+			/>
+		</div>
+	);
 }
 
 function getMarkers(route) {
