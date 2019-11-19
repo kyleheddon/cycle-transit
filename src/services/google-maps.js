@@ -33,8 +33,11 @@ export function queryDirections(origin, destination, mode, optionalParams = {}) 
 	});
 }
 
-export function findPlace(searchString) {
+export function findPlace(searchString, logUrl = false) {
 	const url = `${FIND_PLACE_API_URL}&inputtype=textquery&input=${searchString}`;
+	if (logUrl) {
+		console.log('findPlace', url);
+	}
 	return getJson(url);
 }
 
@@ -44,6 +47,6 @@ export function getPlaceDetails(placeId) {
 }
 
 export const autoComplete = asyncCache((str) => {
-	const url = `${AUTO_COMPLETE_API_URL}&input=${str}&location=${ATLANTA_LAT_LON}&radius=50`;
+	const url = `${AUTO_COMPLETE_API_URL}&input=${str}&location=${ATLANTA_LAT_LON}&radius=50&components=country:us`;
 	return getJson(url);
 }, useCache);

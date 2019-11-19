@@ -6,6 +6,7 @@ import {
 	findPlace,
 	getPlaceDetails,
 } from './google-maps';
+import { ORIGIN_AND_DESTINATION_STATIONS_ARE_SAME } from '../constants/errors';
 import { reverseGeocode as mapQuestReverseGeocode } from './map-quest';
 import moment from 'moment';
 
@@ -39,10 +40,10 @@ async function makeMixedRoute(origin, destination, updateProgress, options) {
 		findNearbyRailStation(destination)
 	]);
 	
-	console.log({
-		originStation: originStation.name,
-		destinationStation: destinationStation.name,
-	});
+	if (originStation.name === destinationStation.name) {
+		console.log('error', ORIGIN_AND_DESTINATION_STATIONS_ARE_SAME)
+		throw ORIGIN_AND_DESTINATION_STATIONS_ARE_SAME;
+	}
 
 	const [firstBikeRoute, lastBikeRoute] = await Promise.all([
 		makeBikeRoute(origin, originStation.name),
@@ -98,10 +99,11 @@ function calculateArrivalTime(transitRoute, lastBikeRoute) {
 }
 
 async function findNearbyRailStation(location) {
-	const searchString = `Marta sations near ${location}`;
+	const searchString = `Marta rail stations near ${location}`;
 	const placeResults = await findPlace(searchString);
 
 	if (!placeResults.candidates || !placeResults.candidates.length) {
+		// TODO: display user error
 		console.log('no place candidates for ' + location);
 		return [];
 	}

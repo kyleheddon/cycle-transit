@@ -5,6 +5,7 @@ import MixedRouteCard from './MixedRouteCard';
 const RouteList = ({
 	bikeRoute,
 	mixedRoute,
+	mixedRouteError,
 	origin,
 	destination,
 }) => {
@@ -41,6 +42,7 @@ const RouteList = ({
 			/>
 			<MixedRouteCard
 				route={mixedRoute}
+				error={mixedRouteError}
 				origin={origin}
 				destination={destination}
 				isExpanded={expandedCard === 'mixedRoute'}

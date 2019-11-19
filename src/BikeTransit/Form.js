@@ -38,9 +38,9 @@ const Form = ({
 	if (loading || bikeRoute || mixedRoute) {
 		return (
 			<Typography variant="h5" component="h2">
-				<TripOriginIcon /> {origin}
+				<TripOriginIcon /> {origin.replace(', GA, USA', '')}
 				<br />
-				<PlaceIcon /> {destination}
+				<PlaceIcon /> {destination.replace(', GA, USA', '')}
 			</Typography>
 		);
 	}

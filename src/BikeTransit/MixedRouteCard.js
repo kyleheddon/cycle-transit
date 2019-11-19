@@ -9,6 +9,7 @@ import TrainIcon from '@material-ui/icons/Train';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import AddIcon from '@material-ui/icons/Add';
 import { makeStyles } from '@material-ui/core/styles';
+import { red } from '@material-ui/core/colors';
 import RouteSteps from './RouteSteps';
 
 const useStyles = makeStyles(theme => ({
@@ -41,6 +42,7 @@ const MixedRouteCard = forwardRef(({
 	onToggle,
 	activeStep,
 	setActiveStep,
+	error,
 }, ref) => {
 	const classes = useStyles();
 	
@@ -65,7 +67,9 @@ const MixedRouteCard = forwardRef(({
 						<TrainIcon />
 					</span>
 					{(() => {
-						if (!route) {
+						if (error) {
+							return <b style={{ color: red[500], marginLeft: '1rem ' }}>{error}</b>;
+						} else if (!route) {
 							return <CircularProgress
 								className={classes.progress}
 								color="inherit"

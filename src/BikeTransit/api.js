@@ -10,6 +10,7 @@ import {
 import {
 	MAKE_ROUTE_STATUS_UPDATE,
 	MAKE_ROUTE_COMPLETE,
+	MAKE_ROUTE_ERROR,
 } from '../constants/websocket-messages';
 
 export function makeRoute(origin, destination, onUpdate, options = {}) {
@@ -27,6 +28,8 @@ export function makeRoute(origin, destination, onUpdate, options = {}) {
 			}
 			if (message.status === MAKE_ROUTE_COMPLETE) {
 				resolve(message.result);
+			} else if (message.status === MAKE_ROUTE_ERROR) {
+				reject(message.error);
 			} else {
 				onUpdate(message);
 			}

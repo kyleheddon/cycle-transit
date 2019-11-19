@@ -3,6 +3,7 @@ import { makeRoute } from './route';
 import {
 	MAKE_ROUTE_STATUS_UPDATE,
 	MAKE_ROUTE_COMPLETE,
+	MAKE_ROUTE_ERROR,
 } from '../constants/websocket-messages';
 
 const Endpoints = {
@@ -59,11 +60,19 @@ function handleMakeRoute(params, ws) {
 		}));
 	}
 
-	makeRoute(origin, destination, updateProgress, options).then((result) => {
-		ws.send(JSON.stringify({
-			status: MAKE_ROUTE_COMPLETE,
-			result,
-			requestKey,
-		}));
-	});
+	makeRoute(origin, destination, updateProgress, options)
+		.then((result) => {
+			ws.send(JSON.stringify({
+				status: MAKE_ROUTE_COMPLETE,
+				result,
+				requestKey,
+			}));
+		})
+		.catch((error) => {
+			ws.send(JSON.stringify({
+				status: MAKE_ROUTE_ERROR,
+				error,
+				requestKey,
+			}));
+		});
 }

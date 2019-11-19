@@ -14,6 +14,7 @@ export default () => {
 	const [destination, setDestination] = useState('');
 	const [loadingCurrentPosition, setLoadingCurrentPosition] = useState('');
 	const [mixedRoute, setMixedRoute] = useState(null);
+	const [mixedRouteError, setMixedRouteError] = useState(null);
 	const [bikeRoute, setBikeRoute] = useState(null);
 	const [loading, setLoading] = useState(false);
 	const [loadingStep, setLoadingStep] = useState(0);
@@ -91,12 +92,17 @@ export default () => {
 						setLoadingStep(loadingStep + 1);
 					}
 					return Promise.all([
-						makeRoute(origin, destination, onUpdate, { bikeOnly: true }).then((route) => {
-							setBikeRoute(route);
-						}),
-						makeRoute(origin, destination, onUpdate, { bikeOnly: false }).then((route) => {
-							setMixedRoute(route);
-						})
+						makeRoute(origin, destination, onUpdate, { bikeOnly: true })
+							.then((route) => {
+								setBikeRoute(route);
+							}),
+						makeRoute(origin, destination, onUpdate, { bikeOnly: false })
+							.then((route) => {
+								setMixedRoute(route);
+							})
+							.catch((error) => {
+								setMixedRouteError(error);
+							}),
 					]);
 				}}
 				onUseCurrentLocationClick={handleUseCurrentLocationClick}
@@ -108,6 +114,7 @@ export default () => {
 						<RouteList
 							bikeRoute={bikeRoute}
 							mixedRoute={mixedRoute}
+							mixedRouteError={mixedRouteError}
 							origin={origin}
 							destination={destination}
 						/>
