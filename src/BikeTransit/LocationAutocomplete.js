@@ -21,6 +21,7 @@ const LocationAutocomplete = ({
 	onChange,
 	value,
 	id,
+	inputProps,
 }) => {
 	const classes = useStyles();
 	return (
@@ -40,6 +41,7 @@ const LocationAutocomplete = ({
 					fullWidth
 					inputProps={{
 						...params.inputProps,
+						...inputProps,
 						autoComplete: "off",
 					}}
 				/>
@@ -73,6 +75,10 @@ const LocationAutocomplete = ({
 			}}
 		/>
 	);
+}
+
+LocationAutocomplete.defaultProps = {
+	inputProps: {},
 }
 
 export default LocationAutocomplete;

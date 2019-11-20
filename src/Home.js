@@ -14,7 +14,9 @@ const useStyles = makeStyles(theme => ({
 	}
 }));
 
-const Home = () => {
+const Home = ({
+	googleMapsApiKey,
+}) => {
 	const classes = useStyles();
 	return (
 		<div>
@@ -31,7 +33,7 @@ const Home = () => {
 					paddingTop: '4rem',
 				}}
 			>
-				<BikeTransit />
+				<BikeTransit googleMapsApiKey={googleMapsApiKey} />
 			</Container>
 		</div>
 	);

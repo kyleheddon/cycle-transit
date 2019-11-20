@@ -24,7 +24,7 @@ if (module.hot) {
 
     try {
       app = require('./server').default;
-      makeWebSocketServer = require('./services/websocket').default;
+      // makeWebSocketServer = require('./services/websocket').default;
       server.removeListener('request', currentApp);
       server.on('request', app);
       currentApp = app;
