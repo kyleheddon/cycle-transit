@@ -8,6 +8,7 @@ import GoogleMapsContainer from './GoogleMapsContainer';
 import Directions from './Directions';
 import MapFrame from './MapFrame';
 import PlaceDetails from './PlaceDetails';
+import RouteDetails from './RouteDetails';
 
 const Home = ({
 	googleMapsApiKey,
@@ -113,7 +114,11 @@ const Home = ({
 			}
 			footer={(() => {
 				if (selectedOrigin && selectedDestination) {
-					return "Route details";
+					return <RouteDetails
+						bikeRoute={bikeRoute}
+						mixedRoute={mixedRoute}
+						travelMode={travelMode}
+					/>;
 				}
 
 				const place = selectedOrigin || selectedDestination;
