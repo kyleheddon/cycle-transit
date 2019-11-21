@@ -9,17 +9,6 @@ const useStyles = makeStyles((theme) => ({
 	},
 	fab: {
 		margin: theme.spacing(1),
-		backgroundColor: 'white',
-		color: 'blue',
-	},
-	white: {
-		color: 'white',
-	},
-	extendedIcon: {
-		marginRight: theme.spacing(1),
-	},
-	blackText: {
-		color: 'blue',
 	},
 }));
 
@@ -35,13 +24,12 @@ const TravelMode = ({
 			<Fab
 				variant="extended"
 				size="small"
-				color="primary"
 				aria-label="add"
 				className={classes.fab}
 				onClick={onClick}
 			>
 				{icon}
-				<span className={classes.blackText}> {text}</span>
+				<span> {text}</span>
 			</Fab>
 		);
 	} else {
@@ -50,7 +38,7 @@ const TravelMode = ({
 				className={classes.margin}
 				onClick={onClick}
 			>
-				<span className={classes.white}>
+				<span>
 					{icon}
 					<span> {text}</span>
 				</span>

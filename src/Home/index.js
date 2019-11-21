@@ -9,7 +9,6 @@ import Directions from './Directions';
 const Home = ({
 	googleMapsApiKey,
 }) => {
-	const [showDirectionsForm, setShowDirectionsForm] = useState(false);
 	const [bikeRoute, setBikeRoute] = useState(null);
 	const [loading, setLoading] = useState(false);
 	const [mixedRoute, setMixedRoute] = useState(null);
@@ -59,10 +58,6 @@ const Home = ({
 		});
 	}
 
-	const handleDirectionsClick = () => {
-		setShowDirectionsForm(true);
-	}
-	
 	const selectedPlace = destination && placeDetails[destination.place_id] ? placeDetails[destination.place_id] : null;
 	const markers = [];
 	if (selectedPlace) {
@@ -87,28 +82,20 @@ const Home = ({
 	}
 	return (
 		<div style={{ height: '90vh', width: '100%' }}>
-			{showDirectionsForm
-				? <Directions
-					destination={destination}
-					origin={origin}
-					onSetOrigin={handleSelectOrigin}
-					onSetDestination={handleSelectDestination}
-					bikeRoute={bikeRoute}
-					mixedRoute={mixedRoute}
-					travelMode={travelMode}
-					setTravelMode={setTravelMode}
-				/>
-				: <SearchBar
-					selectedOption={destination}
-					onSelectOption={handleSelectDestination}
-				/>
-			}
+			<Directions
+				destination={destination}
+				origin={origin}
+				onSetOrigin={handleSelectOrigin}
+				onSetDestination={handleSelectDestination}
+				bikeRoute={bikeRoute}
+				mixedRoute={mixedRoute}
+				travelMode={travelMode}
+				setTravelMode={setTravelMode}
+			/>
 			<GoogleMapsContainer
 				center={center}
 				zoom={zoom}
 				markers={markers}
-				selectedPlace={selectedPlace}
-				onDirectionsClick={handleDirectionsClick}
 				travelMode={travelMode}
 				bikeRoute={bikeRoute}
 				mixedRoute={mixedRoute}

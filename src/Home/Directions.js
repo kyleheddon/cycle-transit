@@ -13,24 +13,11 @@ import TravelMode from './TravelMode';
 const useStyles = makeStyles((theme) => ({
 	root: {
 		padding: theme.spacing(0, 1),
-		color: 'white',
-	},
-	margin: {
-		margin: theme.spacing(1),
-	},
-	fab: {
-		margin: theme.spacing(1),
 		backgroundColor: 'white',
-	},
-	white: {
-		color: 'white',
 	},
 	extendedIcon: {
 		marginRight: theme.spacing(1),
 	},
-	blackText: {
-		color: 'lightblue',
-	}
 }));
 
 const Directions = ({
@@ -65,12 +52,13 @@ const Directions = ({
 					selectedOption={destination}
 				/>
 				{(() => {
-					if (!bikeRoute || !mixedRoute) {
-						return;
+					if (!bikeRoute && !mixedRoute) {
+						return null;
 					}
 
-					const bikeDuration = bikeRoute.routes[0].legs[0].duration.text;
-					const mixedDuration = mixedRoute.duration;
+					const bikeDuration = bikeRoute ? bikeRoute.routes[0].legs[0].duration.text : '';
+					const mixedDuration = mixedRoute ? mixedRoute.duration : '';
+					const noop = () => {};
 
 					return (
 						<div>
@@ -80,7 +68,7 @@ const Directions = ({
 								}
 								text={bikeDuration}
 								isSelected={travelMode === 'bike'}
-								onClick={handleTravelModeClick('bike')}
+								onClick={bikeRoute ? handleTravelModeClick('bike') : noop}
 							/>
 							<TravelMode
 								icon={
@@ -92,7 +80,7 @@ const Directions = ({
 								}
 								text={mixedDuration}
 								isSelected={travelMode === 'mixed'}
-								onClick={handleTravelModeClick('mixed')}
+								onClick={mixedRoute ? handleTravelModeClick('mixed') : noop}
 							/>
 						</div>
 					);

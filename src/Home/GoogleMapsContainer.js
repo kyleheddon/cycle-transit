@@ -1,25 +1,23 @@
-import React from 'react';
-import { Map, InfoWindow, Marker, GoogleApiWrapper } from 'google-maps-react';
+import React, { useMemo } from 'react';
+import { Map, InfoWindow, Marker, GoogleApiWrapper, Polyline } from 'google-maps-react';
 import { runtimeConfig } from '../config';
 import PlaceDetails from './PlaceDetails';
 import BikeRoute from './BikeRoute';
 import MixedRoute from './MixedRoute';
+import { getPolylinePath } from './util';
 
 const MapContainer = ({
 	google,
 	center,
 	zoom,
 	markers,
-	selectedPlace,
-	onDirectionsClick,
 	travelMode,
 	bikeRoute,
 	mixedRoute,
 }) => {
-	const bounds = new google.maps.LatLngBounds();
-	markers.forEach(marker =>
-		bounds.extend(marker.position)
-	);
+	const bounds = useMemo(() => (
+		getBounds(markers, travelMode, bikeRoute, mixedRoute, google)
+	), [markers, travelMode, bikeRoute, mixedRoute]);
 
 	return (
 		<Map
@@ -27,7 +25,7 @@ const MapContainer = ({
 			initialCenter={center}
 			initialZoom={zoom}
 			bounds={bounds}
-			style={{ height: selectedPlace ? '80%' : '90%', position: 'relative', width: '100%' }}
+			style={{ height: '90%', position: 'relative', width: '100%' }}
 		>
 			{markers.map(marker => (
 				<Marker
@@ -42,11 +40,6 @@ const MapContainer = ({
 					return <BikeRoute bikeRoute={bikeRoute} />
 				} else if (travelMode === 'mixed' && mixedRoute) {
 					return <MixedRoute mixedRoute={mixedRoute} />
-				} else if (selectedPlace) {
-					return <PlaceDetails
-						place={selectedPlace}
-						onDirectionsClick={onDirectionsClick}
-					/>;
 				}
 				return null;
 			})()}
@@ -54,8 +47,32 @@ const MapContainer = ({
 	);
 }
 
-				// {...placeDetails[selectedOption.place_id].geometry.location}
-				// text={placeDetails[selectedOption.place_id].name}
+function getBounds(markers, travelMode, bikeRoute, mixedRoute, google) {
+	const bounds = new google.maps.LatLngBounds();
+	markers.forEach(marker =>
+		bounds.extend(marker.position)
+	);
+
+	let path = [];
+	if (travelMode === 'bike' && bikeRoute) {
+		path = getPolylinePath(google, bikeRoute);
+	} else if (travelMode === 'mixed' && mixedRoute) {
+		path = [
+			mixedRoute.firstBikeRoute,
+			mixedRoute.transitRoute,
+			mixedRoute.lastBikeRoute,
+		].reduce((path, route) => (
+			[...path, ...getPolylinePath(google, route)]
+		), []);
+	}
+	path.forEach(point =>
+		bounds.extend(point)
+	);
+
+	return bounds;
+}
+
 export default GoogleApiWrapper({
-	apiKey: (runtimeConfig.googleMapsApiKey)
+	apiKey: (runtimeConfig.googleMapsApiKey),
+	libraries: ['geometry'],
 })(MapContainer);
