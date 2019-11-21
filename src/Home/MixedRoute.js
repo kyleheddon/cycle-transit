@@ -23,7 +23,7 @@ const MixedRoute = ({
 		<>
 			<Polyline
 				path={firstBikePath}
-				strokeColor="#FF0000"
+				strokeColor="#0000FF"
 				strokeOpacity={0.8}
 				strokeWeight={5}
 				google={google}
@@ -36,7 +36,7 @@ const MixedRoute = ({
 			/>
 			<Polyline
 				path={lastBikePath}
-				strokeColor="#FF0000"
+				strokeColor="#0000FF"
 				strokeOpacity={0.8}
 				strokeWeight={5}
 				google={google}

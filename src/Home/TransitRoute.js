@@ -19,7 +19,7 @@ const TransitRoute = ({
 					path={path}
 					strokeColor={color}
 					strokeOpacity={0.9}
-					strokeWeight={5}
+					strokeWeight={7}
 					google={google}
 					{...props}
 				/>

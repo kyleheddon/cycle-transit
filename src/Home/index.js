@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ATLANTA_LOCATION } from '../constants';
 import SearchBar from './SearchBar';
 import PlaceIcon from '@material-ui/icons/Place';
@@ -22,6 +22,15 @@ const Home = ({
 	const [zoom, setZoom] = useState(11);
 	const [placeDetails, setPlaceDetails] = useState({});
 	const [travelMode, setTravelMode] = useState('bike');
+	
+	useEffect(() => {
+		const originDetails = getPlaceDetailsObj(origin, placeDetails);
+		const destinationDetails = getPlaceDetailsObj(destination, placeDetails);
+		if (originDetails && destinationDetails) {
+			const title = `From ${originDetails.name} to ${destinationDetails.name}`;
+			document.title = title;
+		}
+	}, [origin, destination, placeDetails]);
 
 	const handleSelectOrigin = (origin) => {
 		setOrigin(origin);
@@ -30,6 +39,9 @@ const Home = ({
 			if (destination) {
 				fetchRoutes(origin, destination);
 			}
+		} else {
+			setBikeRoute(null);
+			setMixedRoute(null);
 		}
 	}
 
@@ -40,9 +52,12 @@ const Home = ({
 			if (origin) {
 				fetchRoutes(origin, destination);
 			}
+		} else {
+			setBikeRoute(null);
+			setMixedRoute(null);
 		}
 	}
-	
+
 	const fetchRoutes = (origin, destination) => {
 		setLoading(true);
 		return Promise.all([
@@ -66,7 +81,7 @@ const Home = ({
 		});
 	}
 
-	const selectedDestination = destination && placeDetails[destination.place_id] ? placeDetails[destination.place_id] : null;
+	const selectedDestination = getPlaceDetailsObj(destination, placeDetails);
 	const markers = [];
 	if (selectedDestination) {
 		markers.push({
@@ -75,7 +90,7 @@ const Home = ({
 			title: selectedDestination.name,
 		})
 	}
-	const selectedOrigin = origin && placeDetails[origin.place_id] ? placeDetails[origin.place_id] : null;
+	const selectedOrigin = getPlaceDetailsObj(origin, placeDetails);
 	if (selectedOrigin) {
 		markers.push({
 			name: selectedOrigin.name,
@@ -129,6 +144,11 @@ const Home = ({
 			})()}
 		/>
 	);
+}
+
+
+function getPlaceDetailsObj(place, placeDetails) {
+	return place && placeDetails[place.place_id] ? placeDetails[place.place_id] : null;
 }
 
 export default Home;

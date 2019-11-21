@@ -48,8 +48,9 @@ const RouteDetails = ({
 								firstBikeRoute,
 								transitRoute,
 								lastBikeRoute,
+								stations,
 							} = mixedRoute;
-							const distance = getMiles(firstBikeRoute) - getMiles(lastBikeRoute);
+							const distance = getMiles(firstBikeRoute) + getMiles(lastBikeRoute);
 							
 							return (
 								<>
@@ -62,11 +63,7 @@ const RouteDetails = ({
 										</span>
 									</Typography>
 									<Typography component="p">
-										Via {[firstBikeRoute, transitRoute, lastBikeRoute]
-												.filter(r => r.routes[0].summary)
-												.map(r => r.routes[0].summary)
-												.join(', ')
-											}
+										Via {firstBikeRoute.routes[0].summary}, Marta, {lastBikeRoute.routes[0].summary}
 									</Typography>
 								</>
 							);
