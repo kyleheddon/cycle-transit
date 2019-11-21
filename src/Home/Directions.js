@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import AppBar from '@material-ui/core/AppBar';
 import DebouncedLocationAutocomplete from './DebouncedLocationAutocomplete';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
@@ -38,7 +37,7 @@ const Directions = ({
 
 	return (
 		<>
-			<AppBar position="static" className={classes.root}>
+			<div position="static" className={classes.root}>
 				<DebouncedLocationAutocomplete
 					label="Origin"
 					id="origin_autocomplete"
@@ -85,7 +84,7 @@ const Directions = ({
 						</div>
 					);
 				})()}
-			</AppBar>
+			</div>
 		</>
 	);
 }

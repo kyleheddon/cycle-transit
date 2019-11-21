@@ -6,6 +6,9 @@ import { getPlaceDetails } from '../api';
 import { makeRoute } from '../BikeTransit/api';
 import GoogleMapsContainer from './GoogleMapsContainer';
 import Directions from './Directions';
+import MapFrame from './MapFrame';
+import PlaceDetails from './PlaceDetails';
+
 const Home = ({
 	googleMapsApiKey,
 }) => {
@@ -21,21 +24,25 @@ const Home = ({
 
 	const handleSelectOrigin = (origin) => {
 		setOrigin(origin);
-		fetchPlaceDetails(origin);
-		if (destination) {
-			fetchRoute(origin, destination);
+		if (origin) {
+			fetchPlaceDetails(origin);
+			if (destination) {
+				fetchRoutes(origin, destination);
+			}
 		}
 	}
 
 	const handleSelectDestination = (destination) => {
 		setDestination(destination);
-		fetchPlaceDetails(destination);
-		if (origin) {
-			fetchRoute(origin, destination);
+		if (destination) {
+			fetchPlaceDetails(destination);
+			if (origin) {
+				fetchRoutes(origin, destination);
+			}
 		}
 	}
 	
-	const fetchRoute = (origin, destination) => {
+	const fetchRoutes = (origin, destination) => {
 		setLoading(true);
 		return Promise.all([
 			makeRoute(origin.description, destination.description, () => {}, { bikeOnly: true })
@@ -58,13 +65,13 @@ const Home = ({
 		});
 	}
 
-	const selectedPlace = destination && placeDetails[destination.place_id] ? placeDetails[destination.place_id] : null;
+	const selectedDestination = destination && placeDetails[destination.place_id] ? placeDetails[destination.place_id] : null;
 	const markers = [];
-	if (selectedPlace) {
+	if (selectedDestination) {
 		markers.push({
-			name: selectedPlace.name,
-			position: selectedPlace.geometry.location,
-			title: selectedPlace.name,
+			name: selectedDestination.name,
+			position: selectedDestination.geometry.location,
+			title: selectedDestination.name,
 		})
 	}
 	const selectedOrigin = origin && placeDetails[origin.place_id] ? placeDetails[origin.place_id] : null;
@@ -81,26 +88,41 @@ const Home = ({
 		setCenter(center);
 	}
 	return (
-		<div style={{ height: '90vh', width: '100%' }}>
-			<Directions
-				destination={destination}
-				origin={origin}
-				onSetOrigin={handleSelectOrigin}
-				onSetDestination={handleSelectDestination}
-				bikeRoute={bikeRoute}
-				mixedRoute={mixedRoute}
-				travelMode={travelMode}
-				setTravelMode={setTravelMode}
-			/>
-			<GoogleMapsContainer
-				center={center}
-				zoom={zoom}
-				markers={markers}
-				travelMode={travelMode}
-				bikeRoute={bikeRoute}
-				mixedRoute={mixedRoute}
-			/>
-		</div>
+		<MapFrame
+			header={
+				<Directions
+					destination={destination}
+					origin={origin}
+					onSetOrigin={handleSelectOrigin}
+					onSetDestination={handleSelectDestination}
+					bikeRoute={bikeRoute}
+					mixedRoute={mixedRoute}
+					travelMode={travelMode}
+					setTravelMode={setTravelMode}
+				/>
+			}
+			main={
+				<GoogleMapsContainer
+					center={center}
+					zoom={zoom}
+					markers={markers}
+					travelMode={travelMode}
+					bikeRoute={bikeRoute}
+					mixedRoute={mixedRoute}
+				/>
+			}
+			footer={(() => {
+				if (selectedOrigin && selectedDestination) {
+					return "Route details";
+				}
+
+				const place = selectedOrigin || selectedDestination;
+				if (place) {
+					return <PlaceDetails place={place} />;
+				}
+				return null;
+			})()}
+		/>
 	);
 }
 

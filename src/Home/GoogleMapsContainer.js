@@ -25,7 +25,7 @@ const MapContainer = ({
 			initialCenter={center}
 			initialZoom={zoom}
 			bounds={bounds}
-			style={{ height: '90%', position: 'relative', width: '100%' }}
+			style={{ height: '100%', position: 'relative', width: '100%' }}
 		>
 			{markers.map(marker => (
 				<Marker

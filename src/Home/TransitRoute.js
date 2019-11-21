@@ -15,6 +15,7 @@ const TransitRoute = ({
 			const color = step.transit_details.line.color;
 			return (
 				<Polyline
+					key={step.polyline.points}
 					path={path}
 					strokeColor={color}
 					strokeOpacity={0.9}

@@ -15,7 +15,6 @@ const useStyles = makeStyles((theme) => ({
 
 const PlaceDetails = ({
 	place,
-	onDirectionsClick,
 }) => {
 	const classes = useStyles();
 	return (
@@ -28,16 +27,6 @@ const PlaceDetails = ({
 					{place.formatted_address}
 				</Typography>
 			</CardContent>
-			<CardActions disableSpacing>
-				<Button
-					aria-label={`directions to ${place.name}`}
-					color="primary"
-					variant="contained"
-					onClick={onDirectionsClick}
-				>
-					Directions
-				</Button>
-			</CardActions>
 		</Card>
 	);
 }

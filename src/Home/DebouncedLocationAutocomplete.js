@@ -24,10 +24,15 @@ const DebouncedLocationAutocomplete = ({
 		});
 	}, 250), []);
 
+	const handleSelectOption = (option) => {
+		setValue('');
+		onSelectOption(option);
+	}
+
 	return (
 		<LocationAutocomplete
 			options={options}
-			onOptionChange={onSelectOption}
+			onOptionChange={handleSelectOption}
 			label={label}
 			onChange={(value) => {
 				setValue(value);
