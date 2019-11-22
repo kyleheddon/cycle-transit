@@ -7,11 +7,16 @@ import AppBar from '@material-ui/core/AppBar';
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles(theme => ({
-	root: {
+	header: {
+		position: 'absolute',
+		top: 0,
+		width: '100%',
+	},
+	footer: {
 		position: 'absolute',
 		bottom: 0,
 		width: '100%',
-	}
+	},
 }));
 
 const MapFrame = ({
@@ -44,7 +49,10 @@ const MapFrame = ({
 			}}
 		>
 			{header &&
-				<header ref={headerRef}>
+				<header
+					className={classes.header}
+					ref={headerRef}
+				>
 					{header}
 				</header>
 			}
@@ -58,7 +66,7 @@ const MapFrame = ({
 			</section>
 			{footer &&
 				<footer
-					className={classes.root}
+					className={classes.footer}
 					ref={footerRef}
 				>
 						{footer}
