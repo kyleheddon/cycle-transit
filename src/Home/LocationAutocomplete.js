@@ -11,6 +11,10 @@ const LocationAutocomplete = ({
 	id,
 	inputProps,
 	renderOption,
+	isOpen,
+	onOpen,
+	onClose,
+	loading,
 }) => {
 	return (
 		<Autocomplete
@@ -19,6 +23,9 @@ const LocationAutocomplete = ({
 			options={options}
 			value={value}
 			freeSolo
+			open={isOpen}
+			onOpen={onOpen}
+			onClose={onClose}
 			renderInput={params => (
 				<TextField
 					{...params}
@@ -38,6 +45,7 @@ const LocationAutocomplete = ({
 			onChange={(event, option) => {
 				onOptionChange(option);
 			}}
+			loading={loading}
 		/>
 	);
 }

@@ -8,6 +8,7 @@ import {
 	findPlace,
 } from '../BikeTransit/api';
 import AutocompleteOption from './AutocompleteOption';
+import CurrentLocationOption from './CurrentLocationOption';
 
 const OptionTypes = {
 	CurrentLocation: 'current_location',
@@ -26,7 +27,7 @@ const DebouncedLocationAutocomplete = ({
 	selectedOption,
 	canSelectUserLocation,
 }) => {
-	const [isOpen, setisOpen] = useState(canSelectUserLocation);
+	const [isOpen, setIsOpen] = useState(canSelectUserLocation);
 	const [value, setValue] = useState('');
 	const [loadingCurrentPosition, setLoadingCurrentPosition] = useState(false);
 	const [userLocation, setUserLocation] = useState({});
@@ -44,6 +45,7 @@ const DebouncedLocationAutocomplete = ({
 		if (option && option.type === OptionTypes.CurrentLocation) {
 			setLoadingCurrentPosition(true);
 			setValue(option.text);
+			setIsOpen(false);
 			getUserPlace()
 				.then((result) => {
 					setLoadingCurrentPosition(false);
@@ -59,6 +61,9 @@ const DebouncedLocationAutocomplete = ({
 			onSelectOption(option);
 			if (!option) {
 				setOptions([]);
+				setIsOpen(true);
+			} else {
+				setIsOpen(false);
 			}
 		}
 	}
@@ -90,14 +95,15 @@ const DebouncedLocationAutocomplete = ({
 			id={id}
 			renderOption={(option) => {
 				if (option.type === OptionTypes.AutocompleteResult) {
-					return <AutocompleteOption option={option} />
+					return <AutocompleteOption option={option} />;
 				} else if (option.type === OptionTypes.CurrentLocation) {
-					return <div>{option.text}</div>
+					return <CurrentLocationOption option={option} />;
 				}
 			}}
 			onOpen={() => setIsOpen(true)}
 			onClose={() => setIsOpen(false)}
-			open={isOpen}
+			isOpen={isOpen}
+			loading={loadingCurrentPosition && canSelectUserLocation}
 		/>
 	);
 }
