@@ -11,6 +11,10 @@ const useStyles = makeStyles(theme => ({
 		position: 'absolute',
 		top: 0,
 		width: '100%',
+		zIndex: 1,
+	},
+	section: {
+		position: 'relative',
 	},
 	footer: {
 		position: 'absolute',
@@ -25,6 +29,7 @@ const MapFrame = ({
 	footer,
 }) => {
 	const [mainHeight, setMainHeight] = useState('100vh');
+	const [topHeight, setTopHeight] = useState(0);
 	const containerRef = useRef(null);
 	const headerRef = useRef(null);
 	const footerRef = useRef(null);
@@ -37,8 +42,14 @@ const MapFrame = ({
 			? footerRef.current.getBoundingClientRect().height
 			: 0;
 
+		setTopHeight(headerHeight);
 		setMainHeight(containerHeight - (headerHeight + footerHeight) + 'px');
 	}, [header, main, footer]);
+	
+	let topStyle = {};
+	if (topHeight) {
+		topStyle.paddingTop = topHeight;
+	}
 	return (
 		<div
 			ref={containerRef}
@@ -57,9 +68,10 @@ const MapFrame = ({
 				</header>
 			}
 			<section
+				className={classes.section}
 				style={{
 					height: mainHeight,
-					position: 'relative',
+					...topStyle,
 				}}
 			>
 				{main}
