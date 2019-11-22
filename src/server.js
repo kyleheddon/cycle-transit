@@ -3,8 +3,12 @@ import React from 'react';
 import { StaticRouter } from 'react-router-dom';
 import express from 'express';
 import { renderToString } from 'react-dom/server';
-import { autoComplete, getPlaceDetails } from './services/google-maps';
-import { reverseGeocode } from './services/route';
+import {
+    autoComplete,
+    getPlaceDetails,
+    findPlace,
+    reverseGeocode,
+} from './services/google-maps';
 import { runtimeConfig } from './config';
 const assets = require(process.env.RAZZLE_ASSETS_MANIFEST);
 
@@ -30,6 +34,12 @@ server
           res.status(200).send(result);
       });
   })
+  .get('/findPlace', (req, res) => {
+      const { str } = req.query;
+      findPlace(str).then((result) => {
+          res.status(200).send(result);
+      });
+  })
   .get('/*', (req, res) => {
     const context = {};
     const markup = renderToString(
@@ -47,7 +57,7 @@ server
     <head>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta charset="utf-8" />
-        <title>Atl Bike + Transit</title>
+        <title>Marta Bike</title>
         <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no" />
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />

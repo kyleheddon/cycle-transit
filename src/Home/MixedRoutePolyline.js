@@ -3,7 +3,7 @@ import { Polyline } from 'google-maps-react';
 import TransitRoute from './TransitRoute';
 import { getPolylinePath } from './util';
 
-const MixedRoute = ({
+const MixedRoutePolyline = ({
 	mixedRoute,
 	google,
 	...props,
@@ -46,4 +46,4 @@ const MixedRoute = ({
 	);
 }
 
-export default MixedRoute;
+export default MixedRoutePolyline;

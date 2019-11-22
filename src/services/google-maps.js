@@ -10,9 +10,15 @@ const NEARBY_PLACES_API_URL = `${API_BASE_URL}/place/nearbysearch/json?key=${GOO
 const FIND_PLACE_API_URL = `${API_BASE_URL}/place/findplacefromtext/json?key=${GOOGLE_MAP_API_DEV_KEY}`;
 const PLACE_DETAILS_API_URL = `${API_BASE_URL}/place/details/json?key=${GOOGLE_MAP_API_DEV_KEY}`;
 const AUTO_COMPLETE_API_URL = `${API_BASE_URL}/place/autocomplete/json?key=${GOOGLE_MAP_API_DEV_KEY}`;
+const REVERSE_GEOCODE_API_URL = `${API_BASE_URL}/geocode/json?key=${GOOGLE_MAP_API_DEV_KEY}`
 const MAP_IMAGE_URL = `${API_BASE_URL}/staticmap?key=${GOOGLE_MAP_API_DEV_KEY}`;
 const ATLANTA_LAT_LON = '33.7489954,-84.3879824';
 const useCache = process.env['USE_GOOGLE_MAPS_CACHE'];
+
+export function reverseGeocode(lat, lng) {
+	const url = `${REVERSE_GEOCODE_API_URL}&latlng=${lat},${lng}`;
+	return getJson(url);
+}
 
 export function queryDirections(origin, destination, mode, optionalParams = {}) {
 	const options = { ...optionalParams };

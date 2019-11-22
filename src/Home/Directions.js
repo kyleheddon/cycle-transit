@@ -9,6 +9,7 @@ import TrainIcon from '@material-ui/icons/Train';
 import AddIcon from '@material-ui/icons/Add';
 import TravelMode from './TravelMode';
 
+// TODO: use current location
 const useStyles = makeStyles((theme) => ({
 	root: {
 		padding: theme.spacing(0, 1),
@@ -43,6 +44,7 @@ const Directions = ({
 					id="origin_autocomplete"
 					onSelectOption={onSetOrigin}
 					selectedOption={origin}
+					canSelectUserLocation
 				/>
 				<DebouncedLocationAutocomplete
 					label="Destination"

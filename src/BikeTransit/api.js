@@ -49,6 +49,10 @@ export function reverseGeocode(latitude, longitude) {
 	});
 }
 
+export function findPlace(str) {
+	return fetch(`/findPlace?str=${str}`).then(response => response.json());
+}
+
 function makeRouteWebsocket(origin, destination, onUpdate, options, requestKey) {
 	socket.send('makeRoute', {
 		origin,

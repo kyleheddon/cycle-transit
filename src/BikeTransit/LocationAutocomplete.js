@@ -47,6 +47,9 @@ const LocationAutocomplete = ({
 				/>
 			)}
 			renderOption={option => {
+				if (option.render) {
+					return option.render();
+				}
 				const matches = option.structured_formatting.main_text_matched_substrings;
 				const parts = parse(
 					option.structured_formatting.main_text,

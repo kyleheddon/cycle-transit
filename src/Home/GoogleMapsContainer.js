@@ -2,8 +2,8 @@ import React, { useMemo } from 'react';
 import { Map, InfoWindow, Marker, GoogleApiWrapper, Polyline } from 'google-maps-react';
 import { runtimeConfig } from '../config';
 import PlaceDetails from './PlaceDetails';
-import BikeRoute from './BikeRoute';
-import MixedRoute from './MixedRoute';
+import BikeRoutePolyline from './BikeRoutePolyline';
+import MixedRoutePolyline from './MixedRoutePolyline';
 import { getPolylinePath } from './util';
 
 const MapContainer = ({
@@ -37,9 +37,9 @@ const MapContainer = ({
 			))}
 			{(() => {
 				if (travelMode === 'bike' && bikeRoute) {
-					return <BikeRoute bikeRoute={bikeRoute} />
+					return <BikeRoutePolyline bikeRoute={bikeRoute} />
 				} else if (travelMode === 'mixed' && mixedRoute) {
-					return <MixedRoute mixedRoute={mixedRoute} />
+					return <MixedRoutePolyline mixedRoute={mixedRoute} />
 				}
 				return null;
 			})()}

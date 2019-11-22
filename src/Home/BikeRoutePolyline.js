@@ -2,7 +2,7 @@ import React  from 'react';
 import { Polyline } from 'google-maps-react';
 import { getPolylinePath } from './util';
 
-const BikeRoute = ({
+const BikeRoutePolyline = ({
 	bikeRoute,
 	google,
 	...props,
@@ -21,4 +21,4 @@ const BikeRoute = ({
 	);
 }
 
-export default BikeRoute;
+export default BikeRoutePolyline;
