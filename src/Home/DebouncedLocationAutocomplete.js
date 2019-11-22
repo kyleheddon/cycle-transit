@@ -68,7 +68,7 @@ const DebouncedLocationAutocomplete = ({
 		if (selectedOption.type === OptionTypes.AutocompleteResult) {
 			selectedValue = selectedOption.structured_formatting.main_text;
 		} else {
-			selectedValue = selectedOption.formatted_address ? selectedOption.formatted_address : selectedOption.text;
+			selectedValue = selectedOption.text;
 		}
 	}
 
