@@ -21,7 +21,7 @@ const userLocationOption = {
 }
 
 const DebouncedLocationAutocomplete = ({
-	label,
+	placeholder,
 	id,
 	onSelectOption,
 	selectedOption,
@@ -86,7 +86,7 @@ const DebouncedLocationAutocomplete = ({
 		<LocationAutocomplete
 			options={allOptions}
 			onOptionChange={handleSelectOption}
-			label={label}
+			placeholder={placeholder}
 			onChange={(value) => {
 				setValue(value);
 				debounceOnTextInput(value);

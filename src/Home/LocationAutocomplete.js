@@ -5,7 +5,7 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 const LocationAutocomplete = ({
 	options,
 	onOptionChange,
-	label,
+	placeholder,
 	onChange,
 	value,
 	id,
@@ -29,7 +29,7 @@ const LocationAutocomplete = ({
 			renderInput={params => (
 				<TextField
 					{...params}
-					label={label}
+					placeholder={placeholder}
 					onChange={(event) => {
 						onChange(event.target.value);
 					}}
@@ -45,6 +45,7 @@ const LocationAutocomplete = ({
 			onChange={(event, option) => {
 				onOptionChange(option);
 			}}
+			renderGroup={() => <div>Hello</div>}
 			loading={loading}
 		/>
 	);

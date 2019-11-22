@@ -4,11 +4,17 @@ import { makeStyles } from '@material-ui/core/styles';
 import Fab from '@material-ui/core/Fab';
 
 const useStyles = makeStyles((theme) => ({
-	margin: {
-		margin: theme.spacing(1),
+	button: {
+		width: '100%',
+		textAlign: 'center',
+		color: 'white',
 	},
 	fab: {
-		margin: theme.spacing(1),
+		width: '100%',
+		textAlign: 'center',
+		backgroundColor: 'white !important',
+		borderRadius: '16px',
+		color: '#4285F4',
 	},
 }));
 
@@ -21,27 +27,22 @@ const TravelMode = ({
 	const classes = useStyles();
 	if (isSelected) {
 		return (
-			<Fab
-				variant="extended"
-				size="small"
-				aria-label="add"
+			<Button
 				className={classes.fab}
 				onClick={onClick}
 			>
 				{icon}
 				<span> {text}</span>
-			</Fab>
+			</Button>
 		);
 	} else {
 		return (
 			<Button
-				className={classes.margin}
+				className={classes.button}
 				onClick={onClick}
 			>
-				<span>
-					{icon}
-					<span> {text}</span>
-				</span>
+				{icon}
+				<span> {text}</span>
 			</Button>
 		);
 	}

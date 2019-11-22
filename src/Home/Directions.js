@@ -3,6 +3,7 @@ import DebouncedLocationAutocomplete from './DebouncedLocationAutocomplete';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Fab from '@material-ui/core/Fab';
+import Grid from '@material-ui/core/Grid';
 import NavigationIcon from '@material-ui/icons/Navigation';
 import DirectionsBikeIcon from '@material-ui/icons/DirectionsBike';
 import TrainIcon from '@material-ui/icons/Train';
@@ -13,7 +14,27 @@ import TravelMode from './TravelMode';
 const useStyles = makeStyles((theme) => ({
 	root: {
 		padding: theme.spacing(0, 1),
-		backgroundColor: 'white',
+		backgroundColor: '#4285F4',
+		color: 'white',
+		'& input, & .MuiAutocomplete-root': {
+			color: 'white',
+			backgroundColor: '#5E97F6',
+		},
+		'& input': {
+			marginLeft: theme.spacing(1),
+		},
+		'& .MuiInput-underline:before': {
+			borderBottom: 'none !important',
+		},
+	},
+	marginBottom: {
+		marginBottom: theme.spacing(1),
+	},
+	padding: {
+		padding: theme.spacing(1, 1),
+	},
+	paddingBottom: {
+		paddingBottom: theme.spacing(1),
 	},
 	extendedIcon: {
 		marginRight: theme.spacing(1),
@@ -42,7 +63,7 @@ const Directions = ({
 
 	return (
 		<>
-			<div position="static" className={classes.root}>
+			<div className={classes.root}>
 				{(() => {
 					// disable for now
 					if (false && isCollapsed) {
@@ -56,21 +77,25 @@ const Directions = ({
 						</a>;
 					} else {
 						return (
-							<>
-								<DebouncedLocationAutocomplete
-									label="Origin"
-									id="origin_autocomplete"
-									onSelectOption={onSetOrigin}
-									selectedOption={origin}
-									canSelectUserLocation
-								/>
-								<DebouncedLocationAutocomplete
-									label="Destination"
-									id="destination_autocomplete"
-									onSelectOption={onSetDestination}
-									selectedOption={destination}
-								/>
-							</>
+							<div className={classes.padding}>
+								<div className={classes.marginBottom}>
+									<DebouncedLocationAutocomplete
+										placeholder="Choose starting point"
+										id="origin_autocomplete"
+										onSelectOption={onSetOrigin}
+										selectedOption={origin}
+										canSelectUserLocation
+									/>
+								</div>
+								<div>
+									<DebouncedLocationAutocomplete
+										placeholder="Choose destination"
+										id="destination_autocomplete"
+										onSelectOption={onSetDestination}
+										selectedOption={destination}
+									/>
+								</div>
+							</div>
 						);
 					}
 				})()}
@@ -84,28 +109,32 @@ const Directions = ({
 					const noop = () => {};
 
 					return (
-						<div>
-							<TravelMode
-								icon={
-									<DirectionsBikeIcon className={classes.extendedIcon} />
-								}
-								text={bikeDuration}
-								isSelected={travelMode === 'bike'}
-								onClick={bikeRoute ? handleTravelModeClick('bike') : noop}
-							/>
-							<TravelMode
-								icon={
-									<span>
-										<DirectionsBikeIcon />
-										<AddIcon />
-										<TrainIcon className={classes.extendedIcon} />
-									</span>
-								}
-								text={mixedDuration}
-								isSelected={travelMode === 'mixed'}
-								onClick={mixedRoute ? handleTravelModeClick('mixed') : noop}
-							/>
-						</div>
+						<Grid container alignItems="center" className={classes.paddingBottom}>
+							<Grid item xs={6}>
+								<TravelMode
+									icon={
+										<DirectionsBikeIcon className={classes.extendedIcon} />
+									}
+									text={bikeDuration}
+									isSelected={travelMode === 'bike'}
+									onClick={bikeRoute ? handleTravelModeClick('bike') : noop}
+								/>
+							</Grid>
+							<Grid item xs={6}>
+								<TravelMode
+									icon={
+										<>
+											<DirectionsBikeIcon />
+											<AddIcon />
+											<TrainIcon className={classes.extendedIcon} />
+										</>
+									}
+									text={mixedDuration}
+									isSelected={travelMode === 'mixed'}
+									onClick={mixedRoute ? handleTravelModeClick('mixed') : noop}
+								/>
+							</Grid>
+						</Grid>
 					);
 				})()}
 			</div>
