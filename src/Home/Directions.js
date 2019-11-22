@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, } from 'react';
 import DebouncedLocationAutocomplete from './DebouncedLocationAutocomplete';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
@@ -30,6 +30,10 @@ const Directions = ({
 	travelMode,
 	setTravelMode,
 }) => {
+	const [isCollapsed, setIsCollapsed] = useState(false);
+	useEffect(() => {
+		setIsCollapsed(origin && destination);
+	}, [origin, destination]);
 	const classes = useStyles();
 
 	const handleTravelModeClick = (mode) => () => {
@@ -39,19 +43,36 @@ const Directions = ({
 	return (
 		<>
 			<div position="static" className={classes.root}>
-				<DebouncedLocationAutocomplete
-					label="Origin"
-					id="origin_autocomplete"
-					onSelectOption={onSetOrigin}
-					selectedOption={origin}
-					canSelectUserLocation
-				/>
-				<DebouncedLocationAutocomplete
-					label="Destination"
-					id="destination_autocomplete"
-					onSelectOption={onSetDestination}
-					selectedOption={destination}
-				/>
+				{(() => {
+					if (isCollapsed) {
+						return <a
+							onClick={(event) => {
+								event.preventDefault();
+								setIsCollapsed(false);
+							}}
+						>
+							[...]
+						</a>;
+					} else {
+						return (
+							<>
+								<DebouncedLocationAutocomplete
+									label="Origin"
+									id="origin_autocomplete"
+									onSelectOption={onSetOrigin}
+									selectedOption={origin}
+									canSelectUserLocation
+								/>
+								<DebouncedLocationAutocomplete
+									label="Destination"
+									id="destination_autocomplete"
+									onSelectOption={onSetDestination}
+									selectedOption={destination}
+								/>
+							</>
+						);
+					}
+				})()}
 				{(() => {
 					if (!bikeRoute && !mixedRoute) {
 						return null;

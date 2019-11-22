@@ -3,7 +3,16 @@ import React, {
 	useRef,
 	useState,
 } from 'react';
+import AppBar from '@material-ui/core/AppBar';
 import { makeStyles } from '@material-ui/core/styles';
+
+const useStyles = makeStyles(theme => ({
+	root: {
+		position: 'absolute',
+		bottom: 0,
+		width: '100%',
+	}
+}));
 
 const MapFrame = ({
 	header,
@@ -14,6 +23,7 @@ const MapFrame = ({
 	const containerRef = useRef(null);
 	const headerRef = useRef(null);
 	const footerRef = useRef(null);
+	const classes = useStyles();
 
 	useEffect(() => {
 		const containerHeight = containerRef.current.getBoundingClientRect().height;
@@ -30,6 +40,7 @@ const MapFrame = ({
 			style={{
 				height: '100vh',
 				width: '100%',
+				position: 'relative',
 			}}
 		>
 			{header &&
@@ -46,8 +57,11 @@ const MapFrame = ({
 				{main}
 			</section>
 			{footer &&
-				<footer ref={footerRef}>
-					{footer}
+				<footer
+					className={classes.root}
+					ref={footerRef}
+				>
+						{footer}
 				</footer>
 			}
 		</div>

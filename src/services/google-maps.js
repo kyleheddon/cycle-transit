@@ -15,10 +15,10 @@ const MAP_IMAGE_URL = `${API_BASE_URL}/staticmap?key=${GOOGLE_MAP_API_DEV_KEY}`;
 const ATLANTA_LAT_LON = '33.7489954,-84.3879824';
 const useCache = process.env['USE_GOOGLE_MAPS_CACHE'];
 
-export function reverseGeocode(lat, lng) {
+export const reverseGeocode = asyncCache((lat, lng) => {
 	const url = `${REVERSE_GEOCODE_API_URL}&latlng=${lat},${lng}`;
 	return getJson(url);
-}
+}, useCache);
 
 export function queryDirections(origin, destination, mode, optionalParams = {}) {
 	const options = { ...optionalParams };
@@ -47,10 +47,10 @@ export function findPlace(searchString, logUrl = false) {
 	return getJson(url);
 }
 
-export function getPlaceDetails(placeId) {
+export const getPlaceDetails = asyncCache((placeId) => {
 	const url = `${PLACE_DETAILS_API_URL}&place_id=${placeId}`;
 	return getJson(url);
-}
+}, useCache);
 
 export const autoComplete = asyncCache((str) => {
 	const url = `${AUTO_COMPLETE_API_URL}&input=${str}&location=${ATLANTA_LAT_LON}&radius=50&components=country:us`;

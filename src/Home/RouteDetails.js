@@ -16,10 +16,6 @@ import { makeStyles } from '@material-ui/core/styles';
 */
 
 const useStyles = makeStyles((theme) => ({
-	root: {
-		position: 'absolute',
-		bottom: 0,
-	}
 }));
 
 const RouteDetails = ({
@@ -30,7 +26,7 @@ const RouteDetails = ({
 	const classes = useStyles();
 	
 	return (
-		<Card className={classes.root}>
+		<Card>
 			<CardContent>
 					{(() => {
 						if (travelMode === 'bike') {

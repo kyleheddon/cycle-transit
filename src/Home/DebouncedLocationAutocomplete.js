@@ -26,6 +26,7 @@ const DebouncedLocationAutocomplete = ({
 	selectedOption,
 	canSelectUserLocation,
 }) => {
+	const [isOpen, setisOpen] = useState(canSelectUserLocation);
 	const [value, setValue] = useState('');
 	const [loadingCurrentPosition, setLoadingCurrentPosition] = useState(false);
 	const [userLocation, setUserLocation] = useState({});
@@ -56,6 +57,9 @@ const DebouncedLocationAutocomplete = ({
 		} else {
 			setValue('');
 			onSelectOption(option);
+			if (!option) {
+				setOptions([]);
+			}
 		}
 	}
 
@@ -64,7 +68,7 @@ const DebouncedLocationAutocomplete = ({
 		if (selectedOption.type === OptionTypes.AutocompleteResult) {
 			selectedValue = selectedOption.structured_formatting.main_text;
 		} else {
-			selectedValue = selectedOption.text;
+			selectedValue = selectedOption.formatted_address ? selectedOption.formatted_address : selectedOption.text;
 		}
 	}
 
@@ -91,6 +95,9 @@ const DebouncedLocationAutocomplete = ({
 					return <div>{option.text}</div>
 				}
 			}}
+			onOpen={() => setIsOpen(true)}
+			onClose={() => setIsOpen(false)}
+			open={isOpen}
 		/>
 	);
 }
