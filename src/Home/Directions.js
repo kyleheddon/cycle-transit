@@ -44,7 +44,8 @@ const Directions = ({
 		<>
 			<div position="static" className={classes.root}>
 				{(() => {
-					if (isCollapsed) {
+					// disable for now
+					if (false && isCollapsed) {
 						return <a
 							onClick={(event) => {
 								event.preventDefault();
