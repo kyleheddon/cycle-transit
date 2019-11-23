@@ -20,3 +20,12 @@ export function getUserLocation() {
 export function getPolylinePath(google, route) {
 	return google.maps.geometry.encoding.decodePath(route.routes[0].overview_polyline.points);
 }
+
+export function getRouteMapUrl(route, travelMode) {
+	const {
+		start_address,
+		end_address,
+	} = route.routes[0].legs[0];
+
+	return `https://www.google.com/maps/dir/?api=1&origin=${start_address}&destination=${end_address}&travelmode=${travelMode}`;
+}
