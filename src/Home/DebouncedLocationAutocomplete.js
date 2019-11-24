@@ -1,12 +1,11 @@
 import React, { useState, useCallback } from 'react';
 import LocationAutocomplete from './LocationAutocomplete';
-import { debounce } from '../BikeTransit/util';
-import { getUserLocation } from './util';
+import { getUserLocation, debounce } from './util';
 import {
 	locationAutoComplete,
 	reverseGeocode,
 	findPlace,
-} from '../BikeTransit/api';
+} from '../api';
 import AutocompleteOption from './AutocompleteOption';
 import CurrentLocationOption from './CurrentLocationOption';
 

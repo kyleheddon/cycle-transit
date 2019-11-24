@@ -1,7 +1,4 @@
-import {
-	locationAutoComplete,
-	reverseGeocode,
-} from '../BikeTransit/api';
+import { reverseGeocode } from '../api';
 
 export function getUserLocation() {
 	return new Promise((resolve, reject) => {
@@ -28,4 +25,14 @@ export function getRouteMapUrl(route, travelMode) {
 	} = route.routes[0].legs[0];
 
 	return `https://www.google.com/maps/dir/?api=1&origin=${start_address}&destination=${end_address}&travelmode=${travelMode}`;
+}
+
+export function debounce(func, timeout) {
+	let timeoutId = null;
+	return (...args) => {
+		window.clearTimeout(timeoutId);
+		timeoutId = window.setTimeout(() => {
+			func(...args);
+		}, timeout);
+	}
 }

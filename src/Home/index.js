@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ATLANTA_LOCATION } from '../constants';
-import SearchBar from './SearchBar';
 import PlaceIcon from '@material-ui/icons/Place';
-import { getPlaceDetails } from '../api';
-import { makeRoute } from '../BikeTransit/api';
+import { getPlaceDetails, makeRoute } from '../api';
 import GoogleMapsContainer from './GoogleMapsContainer';
 import Directions from './Directions';
 import MapFrame from './MapFrame';
