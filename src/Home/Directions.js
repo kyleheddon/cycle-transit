@@ -7,7 +7,6 @@ import Grid from '@material-ui/core/Grid';
 import NavigationIcon from '@material-ui/icons/Navigation';
 import DirectionsBikeIcon from '@material-ui/icons/DirectionsBike';
 import TrainIcon from '@material-ui/icons/Train';
-import AddIcon from '@material-ui/icons/Add';
 import TravelMode from './TravelMode';
 
 // TODO: use current location
@@ -125,7 +124,6 @@ const Directions = ({
 									icon={
 										<>
 											<DirectionsBikeIcon />
-											<AddIcon />
 											<TrainIcon className={classes.extendedIcon} />
 										</>
 									}
