@@ -1,6 +1,10 @@
 import createSocket from './websocket';
 const socket = createSocket();
 
+export function getPlaceDetails(placeId) {
+	return fetch(`/getPlaceDetails?placeId=${placeId}`).then(response => response.json());
+}
+
 import {
 	INITIAL_ROUTE_COMPLETE,
 	FIRST_BIKE_LEG_COMPLETE,
@@ -47,6 +51,10 @@ export function reverseGeocode(latitude, longitude) {
 	return fetch(`/reverseGeocode?latitude=${latitude}&longitude=${longitude}`).then((response) => {
 		return response.json();
 	});
+}
+
+export function findPlace(str) {
+	return fetch(`/findPlace?str=${str}`).then(response => response.json());
 }
 
 function makeRouteWebsocket(origin, destination, onUpdate, options, requestKey) {
