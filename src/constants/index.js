@@ -2,3 +2,10 @@ export const ATLANTA_LOCATION = {
 	lat: 33.7489954,
 	lng: -84.3879824,
 }
+
+export const ATLANTA_BOUNDS = {
+	east: -84.37188914591064,
+	north: 33.7626966626869,
+	south: 33.735291947817686,
+	west: -84.40407565408935,
+}

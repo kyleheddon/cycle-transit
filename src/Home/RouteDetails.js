@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
@@ -38,65 +38,61 @@ const RouteDetails = ({
 	mixedRoute,
 	travelMode,
 }) => {
-	// const [isShowingSteps, setIsShowingSteps] = useState(false);
 	const classes = useStyles();
 	const openMaps = (route, travelMode) => () => {
 		window.location = getRouteMapUrl(route, travelMode);
 	}
-	// const toggleShowSteps = () => {
-	// 	setIsShowingSteps(!isShowingSteps);
-	// }
 	return (
 		<Card>
 			<CardContent>
-					{(() => {
-						if (travelMode === 'bike') {
-							if (bikeRoute) {
-								const leg = bikeRoute.routes[0].legs[0];
-								return (
-									<>
-										<Typography variant="h5" component="h3">
-											<span>
-												<span>{leg.duration.text} </span>
-												<span style={{ color: 'grey' }}>
-													({leg.distance.text})
-												</span>
-											</span>
-										</Typography>
-										<Typography component="p">
-											Via {bikeRoute.routes[0].summary}
-										</Typography>
-									</>
-								);
-							}
-						} else if (mixedRoute) {
-							const {
-								firstBikeRoute,
-								transitRoute,
-								lastBikeRoute,
-								stations,
-							} = mixedRoute;
-							const distance = getMiles(firstBikeRoute) + getMiles(lastBikeRoute);
-							
+				{(() => {
+					if (travelMode === 'bike') {
+						if (bikeRoute) {
+							const leg = bikeRoute.routes[0].legs[0];
 							return (
 								<>
 									<Typography variant="h5" component="h3">
 										<span>
-											<span>{mixedRoute.duration} </span>
+											<span>{leg.duration.text} </span>
 											<span style={{ color: 'grey' }}>
-												({Number((distance).toFixed(1))} mi)
+												({leg.distance.text})
 											</span>
 										</span>
 									</Typography>
 									<Typography component="p">
-										Via {firstBikeRoute.routes[0].summary}, Marta, {lastBikeRoute.routes[0].summary}
+										Via {bikeRoute.routes[0].summary}
 									</Typography>
 								</>
 							);
 						}
+					} else if (mixedRoute) {
+						const {
+							firstBikeRoute,
+							transitRoute,
+							lastBikeRoute,
+							stations,
+						} = mixedRoute;
+						const distance = getMiles(firstBikeRoute) + getMiles(lastBikeRoute);
+						
+						return (
+							<>
+								<Typography variant="h5" component="h3">
+									<span>
+										<span>{mixedRoute.duration} </span>
+										<span style={{ color: 'grey' }}>
+											({Number((distance).toFixed(1))} mi)
+										</span>
+									</span>
+								</Typography>
+								<Typography component="p">
+									Via {firstBikeRoute.routes[0].summary}, Marta, {lastBikeRoute.routes[0].summary}
+								</Typography>
+							</>
+						);
+					}
 
-						return null;
-					})()}
+					return null;
+				})()}
 			</CardContent>
 			{(() => {
 				if (bikeRoute && travelMode === 'bike') {

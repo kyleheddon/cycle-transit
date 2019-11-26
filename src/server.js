@@ -10,6 +10,8 @@ import {
     reverseGeocode,
 } from './services/google-maps';
 import { runtimeConfig } from './config';
+import { Provider } from 'react-redux';
+import store from './store';
 const assets = require(process.env.RAZZLE_ASSETS_MANIFEST);
 
 const server = express();
@@ -44,7 +46,9 @@ server
     const context = {};
     const markup = renderToString(
       <StaticRouter context={context} location={req.url}>
-        <App />
+        <Provider store={store}>
+          <App />
+        </Provider>
       </StaticRouter>
     );
 

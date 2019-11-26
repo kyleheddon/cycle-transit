@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '../store/rootReducer';
 import { ATLANTA_LOCATION } from '../constants';
 import PlaceIcon from '@material-ui/icons/Place';
 import { getPlaceDetails, makeRoute } from '../api';
@@ -7,19 +9,36 @@ import Directions from './Directions';
 import MapFrame from './MapFrame';
 import PlaceDetails from './PlaceDetails';
 import RouteDetails from './RouteDetails';
+import {
+	setOrigin,
+	setDestination,
+	setBikeRoute,
+	setMixedRoute,
+	setPlaceDetails,
+	setTravelMode,
+} from '../store/directionsSlice';
+import {
+	setBoundsNe,
+	setBoundsSw,
+} from '../store/mapSlice';
 
 const Home = ({
 	googleMapsApiKey,
 }) => {
-	const [bikeRoute, setBikeRoute] = useState(null);
 	const [loading, setLoading] = useState(false);
-	const [mixedRoute, setMixedRoute] = useState(null);
-	const [origin, setOrigin] = useState(null);
-	const [destination, setDestination] = useState(null);
-	const [center, setCenter] = useState(ATLANTA_LOCATION);
-	const [zoom, setZoom] = useState(11);
-	const [placeDetails, setPlaceDetails] = useState({});
-	const [travelMode, setTravelMode] = useState('bike');
+	const dispatch = useDispatch();
+	const {
+		origin,
+		destination,
+		bikeRoute,
+		mixedRoute,
+		placeDetails,
+		travelMode,
+	} = useSelector(state => state.directions);
+	const {
+		ne,
+		sw,
+	} = useSelector(state => state.map);
 	
 	useEffect(() => {
 		const originDetails = getPlaceDetailsObj(origin, placeDetails);
@@ -31,28 +50,28 @@ const Home = ({
 	}, [origin, destination, placeDetails]);
 
 	const handleSelectOrigin = (origin) => {
-		setOrigin(origin);
+		dispatch(setOrigin(origin));
 		if (origin) {
 			fetchPlaceDetails(origin);
 			if (destination) {
 				fetchRoutes(origin, destination);
 			}
 		} else {
-			setBikeRoute(null);
-			setMixedRoute(null);
+			dispatch(setBikeRoute(null));
+			dispatch(setMixedRoute(null));
 		}
 	}
 
 	const handleSelectDestination = (destination) => {
-		setDestination(destination);
+		dispatch(setDestination(destination));
 		if (destination) {
 			fetchPlaceDetails(destination);
 			if (origin) {
 				fetchRoutes(origin, destination);
 			}
 		} else {
-			setBikeRoute(null);
-			setMixedRoute(null);
+			dispatch(setBikeRoute(null));
+			dispatch(setMixedRoute(null));
 		}
 	}
 
@@ -61,21 +80,21 @@ const Home = ({
 		return Promise.all([
 			makeRoute(origin.description, destination.description, () => {}, { bikeOnly: true })
 				.then((route) => {
-					setBikeRoute(route);
+					dispatch(setBikeRoute(route));
 				}),
 			makeRoute(origin.description, destination.description, () => {}, { bikeOnly: false })
 				.then((route) => {
-					setMixedRoute(route);
+					dispatch(setMixedRoute(route));
 				})
 		]);
 	}
-	
+
 	const fetchPlaceDetails = (option) => {
 		return getPlaceDetails(option.place_id).then((results) => {
-			setPlaceDetails({
-				...placeDetails,
-				[option.place_id]: results.result,
-			});
+			dispatch(setPlaceDetails({
+				placeId: option.place_id,
+				place: results.result,
+			}));
 		});
 	}
 
@@ -97,10 +116,11 @@ const Home = ({
 		})
 	}
 
-	const onBoundsChange = (center, zoom) => {
-		setZoom(zoom);
-		setCenter(center);
-	}
+	const onBoundsChange = (bounds) => {
+		dispatch(setBoundsNe(getLatLng(bounds.getNorthEast())))
+		dispatch(setBoundsSw(getLatLng(bounds.getSouthWest())))
+	};
+
 	return (
 		<MapFrame
 			header={
@@ -112,17 +132,20 @@ const Home = ({
 					bikeRoute={bikeRoute}
 					mixedRoute={mixedRoute}
 					travelMode={travelMode}
-					setTravelMode={setTravelMode}
+					setTravelMode={(mode) => {
+						dispatch(setTravelMode(mode));
+					}}
 				/>
 			}
 			main={
 				<GoogleMapsContainer
-					center={center}
-					zoom={zoom}
+					ne={ne}
+					sw={sw}
 					markers={markers}
 					travelMode={travelMode}
 					bikeRoute={bikeRoute}
 					mixedRoute={mixedRoute}
+					onBoundsChange={onBoundsChange}
 				/>
 			}
 			footer={(() => {
@@ -142,6 +165,13 @@ const Home = ({
 			})()}
 		/>
 	);
+}
+
+function getLatLng(point) {
+	return {
+		lat: point.lat(),
+		lng: point.lng(),
+	}
 }
 
 

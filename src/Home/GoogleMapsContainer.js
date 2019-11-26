@@ -1,29 +1,38 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import { Map, InfoWindow, Marker, GoogleApiWrapper, Polyline } from 'google-maps-react';
 import { runtimeConfig } from '../config';
 import PlaceDetails from './PlaceDetails';
 import BikeRoutePolyline from './BikeRoutePolyline';
 import MixedRoutePolyline from './MixedRoutePolyline';
 import { getPolylinePath } from './util';
+import { ATLANTA_LOCATION } from '../constants';
 
 const MapContainer = ({
 	google,
-	center,
-	zoom,
 	markers,
 	travelMode,
 	bikeRoute,
 	mixedRoute,
+	onBoundsChange,
+	ne,
+	sw,
 }) => {
-	const bounds = useMemo(() => (
-		getBounds(markers, travelMode, bikeRoute, mixedRoute, google)
-	), [markers, travelMode, bikeRoute, mixedRoute]);
+	useEffect(() => {
+		if (markers.length === 0) {
+			return;
+		}
 
+		const newBounds = getBounds(markers, travelMode, bikeRoute, mixedRoute, google);
+		if (!pointEquals(getLatLng(newBounds.getNorthEast()), ne) || !pointEquals(getLatLng(newBounds.getSouthWest()), sw)) {
+			onBoundsChange(newBounds);
+		}
+	}, [markers, travelMode, bikeRoute, mixedRoute]);
+
+	const bounds = new google.maps.LatLngBounds(sw, ne);
 	return (
 		<Map
 			google={google}
-			initialCenter={center}
-			initialZoom={zoom}
+			initialCenter={getLatLng(bounds.getCenter())}
 			bounds={bounds}
 			style={{ height: '100%', position: 'relative', width: '100%' }}
 		>
@@ -70,6 +79,17 @@ function getBounds(markers, travelMode, bikeRoute, mixedRoute, google) {
 	);
 
 	return bounds;
+}
+
+function getLatLng(point) {
+	return {
+		lat: point.lat(),
+		lng: point.lng(),
+	}
+}
+
+function pointEquals(p1, p2) {
+	return p1.lat === p2.lat && p2.lng === p1.lng;
 }
 
 export default GoogleApiWrapper({

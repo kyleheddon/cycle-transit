@@ -1,11 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import LocationAutocomplete from './LocationAutocomplete';
 import { getUserLocation, debounce } from './util';
-import {
-	locationAutoComplete,
-	reverseGeocode,
-	findPlace,
-} from '../api';
+import { locationAutoComplete } from '../api';
 import AutocompleteOption from './AutocompleteOption';
 import CurrentLocationOption from './CurrentLocationOption';
 
@@ -77,7 +73,7 @@ const DebouncedLocationAutocomplete = ({
 	}
 
 	let allOptions = options;
-	if (options.length === 0 && canSelectUserLocation) {
+	if (options.length === 0 && !selectedOption && canSelectUserLocation) {
 		allOptions = [userLocationOption];
 	}
 

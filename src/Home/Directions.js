@@ -1,4 +1,4 @@
-import React, { useState, useEffect, } from 'react';
+import React from 'react';
 import DebouncedLocationAutocomplete from './DebouncedLocationAutocomplete';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
@@ -9,7 +9,6 @@ import DirectionsBikeIcon from '@material-ui/icons/DirectionsBike';
 import TrainIcon from '@material-ui/icons/Train';
 import TravelMode from './TravelMode';
 
-// TODO: use current location
 const useStyles = makeStyles((theme) => ({
 	root: {
 		padding: theme.spacing(0, 1),
@@ -50,10 +49,6 @@ const Directions = ({
 	travelMode,
 	setTravelMode,
 }) => {
-	const [isCollapsed, setIsCollapsed] = useState(false);
-	useEffect(() => {
-		setIsCollapsed(origin && destination);
-	}, [origin, destination]);
 	const classes = useStyles();
 
 	const handleTravelModeClick = (mode) => () => {
@@ -63,41 +58,25 @@ const Directions = ({
 	return (
 		<>
 			<div className={classes.root}>
-				{(() => {
-					// disable for now
-					if (false && isCollapsed) {
-						return <a
-							onClick={(event) => {
-								event.preventDefault();
-								setIsCollapsed(false);
-							}}
-						>
-							[...]
-						</a>;
-					} else {
-						return (
-							<div className={classes.padding}>
-								<div className={classes.marginBottom}>
-									<DebouncedLocationAutocomplete
-										placeholder="Choose starting point"
-										id="origin_autocomplete"
-										onSelectOption={onSetOrigin}
-										selectedOption={origin}
-										canSelectUserLocation
-									/>
-								</div>
-								<div>
-									<DebouncedLocationAutocomplete
-										placeholder="Choose destination"
-										id="destination_autocomplete"
-										onSelectOption={onSetDestination}
-										selectedOption={destination}
-									/>
-								</div>
-							</div>
-						);
-					}
-				})()}
+				<div className={classes.padding}>
+					<div className={classes.marginBottom}>
+						<DebouncedLocationAutocomplete
+							placeholder="Choose starting point"
+							id="origin_autocomplete"
+							onSelectOption={onSetOrigin}
+							selectedOption={origin}
+							canSelectUserLocation
+						/>
+					</div>
+					<div>
+						<DebouncedLocationAutocomplete
+							placeholder="Choose destination"
+							id="destination_autocomplete"
+							onSelectOption={onSetDestination}
+							selectedOption={destination}
+						/>
+					</div>
+				</div>
 				{(() => {
 					if (!bikeRoute && !mixedRoute) {
 						return null;
