@@ -14,8 +14,9 @@ const MapContainer = ({
 	bikeRoute,
 	mixedRoute,
 	onBoundsChange,
-	ne,
-	sw,
+	bounds,
+	onZoomChange,
+	zoom,
 }) => {
 	useEffect(() => {
 		if (markers.length === 0) {
@@ -23,17 +24,21 @@ const MapContainer = ({
 		}
 
 		const newBounds = getBounds(markers, travelMode, bikeRoute, mixedRoute, google);
-		if (!pointEquals(getLatLng(newBounds.getNorthEast()), ne) || !pointEquals(getLatLng(newBounds.getSouthWest()), sw)) {
+		if (!boundsEqual(bounds, newBounds)) {
 			onBoundsChange(newBounds);
 		}
 	}, [markers, travelMode, bikeRoute, mixedRoute]);
 
-	const bounds = new google.maps.LatLngBounds(sw, ne);
+	const googleMapsBounds = new google.maps.LatLngBounds(bounds.sw, bounds.ne);
 	return (
 		<Map
 			google={google}
-			initialCenter={getLatLng(bounds.getCenter())}
-			bounds={bounds}
+			initialCenter={getLatLng(googleMapsBounds.getCenter())}
+			zoom={zoom}
+			bounds={googleMapsBounds}
+			onZoom_changed={(mapProps, maps) => {
+				console.log('zoom changes', maps);
+			}}
 			style={{ height: '100%', position: 'relative', width: '100%' }}
 		>
 			{markers.map(marker => (
@@ -78,7 +83,14 @@ function getBounds(markers, travelMode, bikeRoute, mixedRoute, google) {
 		bounds.extend(point)
 	);
 
-	return bounds;
+	return getBoundsLatLng(bounds);
+}
+
+function getBoundsLatLng(bounds) {
+	return {
+		ne: getLatLng(bounds.getNorthEast()),
+		sw: getLatLng(bounds.getSouthWest()),
+	}
 }
 
 function getLatLng(point) {
@@ -88,7 +100,11 @@ function getLatLng(point) {
 	}
 }
 
-function pointEquals(p1, p2) {
+function boundsEqual(b1, b2) {
+	return pointsEqual(b1.ne, b2.ne) && pointsEqual(b1.sw, b2.sw);
+}
+
+function pointsEqual(p1, p2) {
 	return p1.lat === p2.lat && p2.lng === p1.lng;
 }
 

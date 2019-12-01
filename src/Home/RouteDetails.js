@@ -110,7 +110,7 @@ const RouteDetails = ({
 								<ExpansionPanel className={classes.panel}>
 									<ExpansionPanelSummary>
 										<ListIcon />
-										<span> Steps</span>
+										<span> Stepz</span>
 									</ExpansionPanelSummary>
 									<ExpansionPanelDetails>
 										<div className={classes.padding}>

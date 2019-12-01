@@ -18,8 +18,8 @@ import {
 	setTravelMode,
 } from '../store/directionsSlice';
 import {
-	setBoundsNe,
-	setBoundsSw,
+	setBounds,
+	setZoom,
 } from '../store/mapSlice';
 
 const Home = ({
@@ -36,8 +36,8 @@ const Home = ({
 		travelMode,
 	} = useSelector(state => state.directions);
 	const {
-		ne,
-		sw,
+		bounds,
+		zoom,
 	} = useSelector(state => state.map);
 	
 	useEffect(() => {
@@ -97,6 +97,10 @@ const Home = ({
 			}));
 		});
 	}
+	
+	const handleZoomChange = (zoom) => {
+		dispatch(setZoom(zoom));
+	}
 
 	const selectedDestination = getPlaceDetailsObj(destination, placeDetails);
 	const markers = [];
@@ -117,8 +121,7 @@ const Home = ({
 	}
 
 	const onBoundsChange = (bounds) => {
-		dispatch(setBoundsNe(getLatLng(bounds.getNorthEast())))
-		dispatch(setBoundsSw(getLatLng(bounds.getSouthWest())))
+		dispatch(setBounds(bounds));
 	};
 
 	return (
@@ -139,13 +142,14 @@ const Home = ({
 			}
 			main={
 				<GoogleMapsContainer
-					ne={ne}
-					sw={sw}
+					bounds={bounds}
 					markers={markers}
 					travelMode={travelMode}
 					bikeRoute={bikeRoute}
 					mixedRoute={mixedRoute}
 					onBoundsChange={onBoundsChange}
+					onZoomChange={handleZoomChange}
+					zoom={zoom}
 				/>
 			}
 			footer={(() => {
