@@ -20,7 +20,7 @@ const Home = ({
 	const [zoom, setZoom] = useState(11);
 	const [placeDetails, setPlaceDetails] = useState({});
 	const [travelMode, setTravelMode] = useState('bike');
-	
+
 	useEffect(() => {
 		const originDetails = getPlaceDetailsObj(origin, placeDetails);
 		const destinationDetails = getPlaceDetailsObj(destination, placeDetails);
@@ -59,17 +59,17 @@ const Home = ({
 	const fetchRoutes = (origin, destination) => {
 		setLoading(true);
 		return Promise.all([
-			makeRoute(origin.description, destination.description, () => {}, { bikeOnly: true })
+			makeRoute(origin, destination, () => {}, { bikeOnly: true })
 				.then((route) => {
 					setBikeRoute(route);
 				}),
-			makeRoute(origin.description, destination.description, () => {}, { bikeOnly: false })
+			makeRoute(origin, destination, () => {}, { bikeOnly: false })
 				.then((route) => {
 					setMixedRoute(route);
 				})
 		]);
 	}
-	
+
 	const fetchPlaceDetails = (option) => {
 		return getPlaceDetails(option.place_id).then((results) => {
 			setPlaceDetails({

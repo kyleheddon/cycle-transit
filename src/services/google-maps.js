@@ -7,6 +7,7 @@ const { GOOGLE_MAP_API_DEV_KEY } = process.env;
 const API_BASE_URL = 'https://maps.googleapis.com/maps/api';
 const DIRECTIONS_API_URL = `${API_BASE_URL}/directions/json?key=${GOOGLE_MAP_API_DEV_KEY}`;
 const NEARBY_PLACES_API_URL = `${API_BASE_URL}/place/nearbysearch/json?key=${GOOGLE_MAP_API_DEV_KEY}`;
+const TEXT_SEARCH_API_URL = `${API_BASE_URL}/place/textsearch/json?key=${GOOGLE_MAP_API_DEV_KEY}`;
 const FIND_PLACE_API_URL = `${API_BASE_URL}/place/findplacefromtext/json?key=${GOOGLE_MAP_API_DEV_KEY}`;
 const PLACE_DETAILS_API_URL = `${API_BASE_URL}/place/details/json?key=${GOOGLE_MAP_API_DEV_KEY}`;
 const AUTO_COMPLETE_API_URL = `${API_BASE_URL}/place/autocomplete/json?key=${GOOGLE_MAP_API_DEV_KEY}`;
@@ -20,7 +21,7 @@ export const reverseGeocode = asyncCache((lat, lng) => {
 	return getJson(url);
 }, useCache);
 
-export function queryDirections(origin, destination, mode, optionalParams = {}) {
+export function queryDirections(origin, destination, mode, optionalParams = {}, logUrl = false) {
 	const options = { ...optionalParams };
 	if (mode === MODE_TRANSIT) {
 		options.transit_mode = TRANSIT_MODE_RAIL;
@@ -30,6 +31,10 @@ export function queryDirections(origin, destination, mode, optionalParams = {}) 
 		return `${acc}&${key}=${options[key]}`;
 	}, '');
 	const url = `${DIRECTIONS_API_URL}&origin=${origin}&destination=${destination}&mode=${mode}${optionsString}`;
+
+	if (logUrl) {
+		console.log('queryDirections', url);
+	}
 
 	return getJson(url).then((result) => {
 		return {
@@ -47,8 +52,19 @@ export function findPlace(searchString, logUrl = false) {
 	return getJson(url);
 }
 
-export const getPlaceDetails = asyncCache((placeId) => {
+export function textSearch(searchString, logUrl = false) {
+	const url = `${TEXT_SEARCH_API_URL}&query=${searchString}`;
+	if (logUrl) {
+		console.log('textSearch()', url);
+	}
+	return getJson(url);
+}
+
+export const getPlaceDetails = asyncCache((placeId, logUrl = false) => {
 	const url = `${PLACE_DETAILS_API_URL}&place_id=${placeId}`;
+	if (logUrl) {
+		console.log('getPlaceDetails', url);
+	}
 	return getJson(url);
 }, useCache);
 

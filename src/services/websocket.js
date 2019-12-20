@@ -4,6 +4,7 @@ import {
 	MAKE_ROUTE_STATUS_UPDATE,
 	MAKE_ROUTE_COMPLETE,
 	MAKE_ROUTE_ERROR,
+	MAKE_ROUTE_STATION_SEARCH,
 } from '../constants/websocket-messages';
 
 const Endpoints = {
@@ -51,11 +52,11 @@ function handleMakeRoute(params, ws) {
 		options,
 		requestKey,
 	} = params;
-	
-	const updateProgress = (status) => {
+
+	const updateProgress = (status, ...args) => {
 		ws.send(JSON.stringify({
-			status: MAKE_ROUTE_STATUS_UPDATE,
 			status,
+			args,
 			requestKey,
 		}));
 	}
@@ -69,9 +70,10 @@ function handleMakeRoute(params, ws) {
 			}));
 		})
 		.catch((error) => {
+			console.error(MAKE_ROUTE_ERROR, error);
 			ws.send(JSON.stringify({
 				status: MAKE_ROUTE_ERROR,
-				error,
+				error: error.message,
 				requestKey,
 			}));
 		});
