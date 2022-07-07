@@ -15,7 +15,7 @@
     "autosuggest-highlight": "^3.1.1",
     "express": "^4.17.1",
     "google-maps-react": "^2.0.2",
-    "moment": "^2.24.0",
+    "moment": "^2.29.4",
     "razzle": "^3.0.0",
     "razzle-heroku": "^3.0.0",
     "razzle-plugin-scss": "^3.0.0",
