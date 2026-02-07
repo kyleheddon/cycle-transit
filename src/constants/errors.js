@@ -1,1 +1,0 @@
-export const ORIGIN_AND_DESTINATION_STATIONS_ARE_SAME = 'Origin and destination stations are the same';
