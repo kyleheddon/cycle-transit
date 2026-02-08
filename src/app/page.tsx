@@ -8,7 +8,9 @@ import { RouteDetails } from '@/components/RouteDetails';
 import { BikeRoutePolyline } from '@/components/BikeRoutePolyline';
 import { MixedRoutePolyline } from '@/components/MixedRoutePolyline';
 import { MockProvider } from '@/components/MockProvider';
+import { ErrorLogger } from '@/components/ErrorLogger';
 import { calculateRoute } from '@/lib/api-client';
+import { logError } from '@/lib/client-logger';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Place, BikeRoute, MixedRoute, TravelMode } from '@/lib/types';
@@ -35,11 +37,13 @@ export default function Home() {
     setMixedRoute(undefined);
 
     try {
-      const originStr = orig.location
-        ? `${orig.location.lat},${orig.location.lng}`
+      const hasOrigLocation = orig.location && typeof orig.location.lat === 'number' && typeof orig.location.lng === 'number';
+      const hasDestLocation = dest.location && typeof dest.location.lat === 'number' && typeof dest.location.lng === 'number';
+      const originStr = hasOrigLocation
+        ? `${orig.location!.lat},${orig.location!.lng}`
         : orig.address || orig.name;
-      const destStr = dest.location
-        ? `${dest.location.lat},${dest.location.lng}`
+      const destStr = hasDestLocation
+        ? `${dest.location!.lat},${dest.location!.lng}`
         : dest.address || dest.name;
 
       const result = await calculateRoute(originStr, destStr);
@@ -64,9 +68,19 @@ export default function Home() {
 
       if (result.bikeError && result.mixedError) {
         toast.error('Could not find routes. Try different locations.');
+        logError('No routes found', undefined, {
+          bikeError: result.bikeError,
+          mixedError: result.mixedError,
+          origin: originStr,
+          destination: destStr,
+        });
       }
-    } catch {
+    } catch (error) {
       toast.error('Failed to calculate route. Please try again.');
+      logError('Route calculation failed', error instanceof Error ? error : undefined, {
+        origin: orig.name,
+        destination: dest.name,
+      });
     } finally {
       setLoading(false);
     }
@@ -75,7 +89,7 @@ export default function Home() {
   const handleSelectOrigin = useCallback(
     (place: Place) => {
       setOrigin(place);
-      setOriginName(place.name);
+      setOriginName(place.address || place.name);
       if (destination) fetchRoutes(place, destination);
     },
     [destination, fetchRoutes]
@@ -84,7 +98,7 @@ export default function Home() {
   const handleSelectDestination = useCallback(
     (place: Place) => {
       setDestination(place);
-      setDestinationName(place.name);
+      setDestinationName(place.address || place.name);
       if (origin) fetchRoutes(origin, place);
     },
     [origin, fetchRoutes]
@@ -94,6 +108,7 @@ export default function Home() {
 
   return (
     <MockProvider>
+      <ErrorLogger />
       <APIProvider apiKey={apiKey}>
         <div className="flex flex-col h-dvh">
           <DirectionsPanel

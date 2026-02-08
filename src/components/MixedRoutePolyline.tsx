@@ -1,9 +1,10 @@
 'use client';
 
-import { useMap, useMapsLibrary } from '@vis.gl/react-google-maps';
+import { useMap } from '@vis.gl/react-google-maps';
 import { useEffect, useRef } from 'react';
 import { BIKE_ROUTE_COLOR } from '@/lib/constants';
 import { decodePolyline } from '@/lib/polyline';
+import { logDebug, logError } from '@/lib/client-logger';
 import type { MixedRoute } from '@/lib/types';
 
 interface MixedRoutePolylineProps {
@@ -12,11 +13,16 @@ interface MixedRoutePolylineProps {
 
 export function MixedRoutePolyline({ route }: MixedRoutePolylineProps) {
   const map = useMap();
-  const coreLib = useMapsLibrary('core');
   const polylinesRef = useRef<google.maps.Polyline[]>([]);
 
   useEffect(() => {
-    if (!map || !coreLib) return;
+    if (!map || typeof google === 'undefined' || !google.maps) {
+      logDebug('MixedRoutePolyline: waiting for map and google.maps to load');
+      return;
+    }
+
+    try {
+      logDebug('MixedRoutePolyline: rendering polylines');
 
     // Clean up old polylines
     polylinesRef.current.forEach((p) => p.setMap(null));
@@ -25,7 +31,7 @@ export function MixedRoutePolyline({ route }: MixedRoutePolylineProps) {
     // First bike leg (blue)
     const firstBikePath = decodePolyline(
       route.firstBikeRoute.directions.routes[0].overview_polyline.points
-    ).map((p) => new google.maps.LatLng(p.lat, p.lng));
+    );
 
     polylinesRef.current.push(
       new google.maps.Polyline({
@@ -41,9 +47,7 @@ export function MixedRoutePolyline({ route }: MixedRoutePolylineProps) {
     const transitSteps = route.transitRoute.routes[0]?.legs[0]?.steps || [];
     for (const step of transitSteps) {
       if (step.travel_mode === 'TRANSIT') {
-        const transitPath = decodePolyline(step.polyline.points).map(
-          (p) => new google.maps.LatLng(p.lat, p.lng)
-        );
+        const transitPath = decodePolyline(step.polyline.points);
         polylinesRef.current.push(
           new google.maps.Polyline({
             path: transitPath,
@@ -59,7 +63,7 @@ export function MixedRoutePolyline({ route }: MixedRoutePolylineProps) {
     // Last bike leg (blue)
     const lastBikePath = decodePolyline(
       route.lastBikeRoute.directions.routes[0].overview_polyline.points
-    ).map((p) => new google.maps.LatLng(p.lat, p.lng));
+    );
 
     polylinesRef.current.push(
       new google.maps.Polyline({
@@ -71,10 +75,15 @@ export function MixedRoutePolyline({ route }: MixedRoutePolylineProps) {
       })
     );
 
+      logDebug('MixedRoutePolyline: created polylines', { count: polylinesRef.current.length });
+    } catch (error) {
+      logError('MixedRoutePolyline: error creating polylines', error instanceof Error ? error : undefined);
+    }
+
     return () => {
       polylinesRef.current.forEach((p) => p.setMap(null));
     };
-  }, [map, coreLib, route]);
+  }, [map, route]);
 
   return null;
 }

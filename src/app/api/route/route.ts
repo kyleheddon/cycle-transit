@@ -13,6 +13,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    console.log('Route request:', { origin, destination });
     const result = await calculateRoutes(origin, destination);
     return NextResponse.json(result);
   } catch (error) {

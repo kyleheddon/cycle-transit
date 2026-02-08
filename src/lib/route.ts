@@ -2,8 +2,6 @@ import { format, addSeconds } from 'date-fns';
 
 const API_KEY = process.env.GOOGLE_MAPS_API_KEY;
 const DIRECTIONS_URL = 'https://maps.googleapis.com/maps/api/directions/json';
-const FIND_PLACE_URL = 'https://maps.googleapis.com/maps/api/place/findplacefromtext/json';
-const PLACE_DETAILS_URL = 'https://maps.googleapis.com/maps/api/place/details/json';
 
 // Server-side cache for route sub-queries (reduces Google API calls)
 const queryCache = new Map<string, { data: unknown; timestamp: number }>();
@@ -90,57 +88,79 @@ async function queryDirections(
   return data;
 }
 
-async function findNearbyRailStation(location: string): Promise<PlaceInfo> {
-  const searchInput = `MARTA rail station near ${location}`;
+function parseCoordinates(location: string): { lat: number; lng: number } | null {
+  const parts = location.split(',');
+  if (parts.length === 2) {
+    const lat = parseFloat(parts[0].trim());
+    const lng = parseFloat(parts[1].trim());
+    if (!isNaN(lat) && !isNaN(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180) {
+      return { lat, lng };
+    }
+  }
+  return null;
+}
 
-  const cacheKey = `station:${searchInput}`;
+async function findNearbyRailStation(location: string): Promise<PlaceInfo> {
+  const cacheKey = `station:${location}`;
   const cached = getCached<PlaceInfo>(cacheKey);
   if (cached) return cached;
 
-  const findParams = new URLSearchParams({
-    input: searchInput,
-    inputtype: 'textquery',
-    key: API_KEY!,
-    fields: 'place_id,name,formatted_address,geometry',
+  // If location is coordinates, use them as bias center with a simple query
+  // Otherwise, include the location name in the query text
+  const coords = parseCoordinates(location);
+  const textQuery = coords ? 'MARTA train station' : `MARTA train station near ${location}`;
+  const biasCenter = coords
+    ? { latitude: coords.lat, longitude: coords.lng }
+    : { latitude: 33.7489954, longitude: -84.3879824 };
+
+  console.log('Finding MARTA station:', { location, textQuery, biasCenter });
+
+  const findRes = await fetch('https://places.googleapis.com/v1/places:searchText', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Goog-Api-Key': API_KEY!,
+      'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.location',
+    },
+    body: JSON.stringify({
+      textQuery,
+      includedType: 'subway_station',
+      locationBias: {
+        circle: {
+          center: biasCenter,
+          radius: 5000.0,
+        },
+      },
+      rankPreference: 'DISTANCE',
+    }),
   });
 
-  const findRes = await fetch(`${FIND_PLACE_URL}?${findParams}`);
+  if (!findRes.ok) {
+    const errorText = await findRes.text();
+    throw new Error(`Failed to search for MARTA station: ${findRes.status} ${errorText}`);
+  }
+
   const findData = await findRes.json();
 
-  if (!findData.candidates?.length) {
+  if (!findData.places?.length) {
     throw new Error(`No MARTA station found near ${location}`);
   }
 
-  const candidate = findData.candidates[0];
-
-  // If geometry is already in the find result, use it
-  if (candidate.geometry?.location) {
-    const result: PlaceInfo = {
-      placeId: candidate.place_id,
-      name: candidate.name,
-      address: candidate.formatted_address || '',
-      location: candidate.geometry.location,
-    };
-    setQueryCache(cacheKey, result);
-    return result;
-  }
-
-  // Otherwise get place details
-  const detailParams = new URLSearchParams({
-    place_id: candidate.place_id,
-    key: API_KEY!,
-    fields: 'place_id,name,formatted_address,geometry',
+  const place = findData.places[0];
+  console.log('Found MARTA station:', {
+    name: place.displayName?.text,
+    location: place.location,
+    forInput: location,
   });
 
-  const detailRes = await fetch(`${PLACE_DETAILS_URL}?${detailParams}`);
-  const detailData = await detailRes.json();
-  const detail = detailData.result;
-
   const result: PlaceInfo = {
-    placeId: detail.place_id,
-    name: detail.name,
-    address: detail.formatted_address || '',
-    location: detail.geometry.location,
+    placeId: place.id?.replace('places/', '') || '',
+    name: place.displayName?.text || '',
+    address: place.formattedAddress || '',
+    location: place.location ? {
+      lat: place.location.latitude,
+      lng: place.location.longitude,
+    } : { lat: 0, lng: 0 },
   };
 
   setQueryCache(cacheKey, result);
@@ -196,17 +216,21 @@ async function makeMixedRoute(origin: string, destination: string): Promise<Mixe
     throw new Error('Origin and destination stations are the same');
   }
 
+  // Use coordinates for bike routing (unambiguous) and addresses for transit
+  const originStationCoords = `${originStation.location.lat},${originStation.location.lng}`;
+  const destStationCoords = `${destinationStation.location.lat},${destinationStation.location.lng}`;
+
   // Step 2: Calculate bike legs in parallel
   const [firstBikeRoute, lastBikeRoute] = await Promise.all([
-    makeBikeRoute(origin, originStation.name),
-    makeBikeRoute(destinationStation.name, destination),
+    makeBikeRoute(origin, originStationCoords),
+    makeBikeRoute(destStationCoords, destination),
   ]);
 
   // Step 3: Get transit route with departure time based on first bike arrival
   const departureTime = Math.floor(Date.now() / 1000) + firstBikeRoute.durationSeconds;
   const transitRoute = await queryDirections(
-    originStation.name,
-    destinationStation.name,
+    originStationCoords,
+    destStationCoords,
     'transit',
     {
       transit_mode: 'rail',

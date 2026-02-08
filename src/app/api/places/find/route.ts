@@ -16,16 +16,48 @@ export async function GET(request: NextRequest) {
   const cached = getCached(cacheKey, CACHE_TTL);
   if (cached) return NextResponse.json(cached);
 
-  const params = new URLSearchParams({
-    input,
-    inputtype: 'textquery',
-    key: API_KEY!,
-    fields: 'place_id,name,formatted_address,geometry',
+  // Use new Places API (New)
+  const res = await fetch('https://places.googleapis.com/v1/places:searchText', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Goog-Api-Key': API_KEY!,
+      'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.location',
+    },
+    body: JSON.stringify({
+      textQuery: input,
+      locationBias: {
+        circle: {
+          center: { latitude: 33.7489954, longitude: -84.3879824 },
+          radius: 30000.0,
+        },
+      },
+    }),
   });
 
-  const res = await fetch(`https://maps.googleapis.com/maps/api/place/findplacefromtext/json?${params}`);
+  if (!res.ok) {
+    const errorText = await res.text();
+    console.error('Google Places Find API request failed:', res.status, errorText);
+    return NextResponse.json({ error: 'Google API request failed' }, { status: res.status });
+  }
+
   const data = await res.json();
 
-  setCache(cacheKey, data);
-  return NextResponse.json(data);
+  // Transform new API format to match old format for backward compatibility
+  const transformedData = {
+    candidates: data.places?.map((place: any) => ({
+      place_id: place.id?.replace('places/', '') || '',
+      name: place.displayName?.text || '',
+      formatted_address: place.formattedAddress || '',
+      geometry: {
+        location: place.location ? {
+          lat: place.location.latitude,
+          lng: place.location.longitude,
+        } : {},
+      },
+    })) || [],
+  };
+
+  setCache(cacheKey, transformedData);
+  return NextResponse.json(transformedData);
 }
