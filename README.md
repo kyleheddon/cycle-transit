@@ -62,6 +62,8 @@ Set `NEXT_PUBLIC_USE_MOCKS=true` in `.env.local` to develop without using real A
 
 ## Architecture
 
+### File Structure
+
 ```
 src/
   app/
@@ -88,12 +90,68 @@ src/
     data/                 # Mock response fixtures
 ```
 
+### Backend Organization
+
+Backend code is split between two directories:
+
+**`src/app/api/` - API Route Handlers (HTTP endpoints)**
+- Next.js route handlers that respond to HTTP requests
+- Each `route.ts` file defines a REST endpoint
+- Examples: `api/route/route.ts`, `api/directions/route.ts`, `api/places/autocomplete/route.ts`
+
+**`src/lib/` - Business Logic & Utilities**
+- Reusable server-side logic called by API routes
+- Core route calculation in `route.ts` (called by `api/route/route.ts`)
+- Server-side caching (`server-cache.ts`)
+- Shared types, constants, and utilities
+
 ### API Cost Management
 
 Both client and server have caching to minimize Google API calls:
 - **Server**: In-memory cache with TTL (2 min for directions, 10 min for autocomplete, 1 hour for place details/geocoding)
 - **Client**: In-memory cache with TTL (prevents redundant requests)
 - **Place Details**: Only requests `place_id,name,formatted_address,geometry` fields (reduces per-request cost)
+
+## API Documentation
+
+API docs are available at `/api-docs` when running the dev server:
+
+```bash
+npm run dev
+# Visit http://localhost:3000/api-docs
+```
+
+The API uses:
+- **Zod** for runtime request/response validation
+- **OpenAPI 3.0** spec auto-generated from Zod schemas
+- **Swagger UI** for interactive documentation
+
+### Adding Documentation to New Endpoints
+
+1. Define Zod schemas in `src/lib/api-schemas.ts`
+2. Validate requests in your route handler using `.safeParse()`
+3. Register the endpoint in `src/lib/openapi.ts`
+
+Example:
+```typescript
+// In route handler
+import { MyRequestSchema } from '@/lib/api-schemas';
+
+export async function POST(request: NextRequest) {
+  const body = await request.json();
+  const validation = MyRequestSchema.safeParse(body);
+
+  if (!validation.success) {
+    return NextResponse.json(
+      { error: 'Invalid request', details: validation.error.format() },
+      { status: 400 }
+    );
+  }
+
+  const data = validation.data; // Fully typed!
+  // ... handle request
+}
+```
 
 ## Deploy to Vercel
 
